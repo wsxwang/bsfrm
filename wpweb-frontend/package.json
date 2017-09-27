@@ -1,0 +1,35 @@
+{
+  "name": "wpweb-frontend",
+  "version": "1.0.0",
+  "description": "前端",
+  "scripts": {
+    "dev": "webpack-dev-server --config webpack.dev.js",
+    "build": "webpack --config webpack.prod.js"
+  },
+  "author": "wangxq",
+  "license": "",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-es2015": "^6.24.1",
+    "clean-webpack-plugin": "^0.1.17",
+    "css-loader": "^0.28.7",
+    "file-loader": "^0.11.2",
+    "style-loader": "^0.18.2",
+    "uglifyjs-webpack-plugin": "^0.4.6",
+    "vue-loader": "^13.0.5",
+    "vue-template-compiler": "^2.4.4",
+    "webpack": "^3.6.0",
+    "webpack-dev-server": "^2.8.2",
+    "webpack-merge": "^4.1.0"
+  },
+  "dependencies": {
+    "element-ui": "^1.4.6",
+    "vue": "^2.4.4"
+  },
+  "babel": {
+    "presets": [
+      "es2015"
+    ]
+  }
+}
