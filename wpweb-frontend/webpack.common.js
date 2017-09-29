@@ -8,6 +8,7 @@ module.exports = {
         // 模块：login
         login: './src/login/app.js',
         admin: './src/admin/app.js',
+		demos: './src/demos/app.js',
     },
     output: {
         // 输出文件名：模块名.dst.js

@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>mbm</title>
-    <!--
+
     <style type="text/css">
-        #login{
+        #demos{
             display: block;
+        }
+        #login{
+            display: none;
         }
         #desktop{
             display: none;
@@ -15,34 +18,47 @@
             display: none;
         }
     </style>
-    -->
+
 </head>
 <body>
+    <button onclick="onclickdemos()">demos</button>
     <button onclick="onclicklogin()">login</button>
     <button onclick="onclickdesktop()">desktop</button>
     <button onclick="onclickadmin()">admin</button>
-    <div id="login" style="display: block">
+	<div id="demos">
+        <script type="text/javascript" src="demos.dst.js"></script>
+    </div>
+    <div id="login">
         <script type="text/javascript" src="login.dst.js"></script>
     </div>
-    <div id="desktop" style="display: none;">
+    <div id="desktop">
         <script type="text/javascript" src="desktop.dst.js"></script>
     </div>
-    <div id="admin" style="display: none;">
+    <div id="admin">
         <script type="text/javascript" src="admin.dst.js"></script>
     </div>
 </body>
 <script>
+    function onclickdemos(){
+        document.getElementById('demos').style.display='block';
+        document.getElementById('login').style.display='none';
+        document.getElementById('desktop').style.display='none';
+        document.getElementById('admin').style.display='none';
+    }
     function onclicklogin(){
+        document.getElementById('demos').style.display='none';
         document.getElementById('login').style.display='block';
         document.getElementById('desktop').style.display='none';
         document.getElementById('admin').style.display='none';
     }
     function onclickdesktop(){
+        document.getElementById('demos').style.display='none';
         document.getElementById('login').style.display='none';
         document.getElementById('desktop').style.display='block';
         document.getElementById('admin').style.display='none';
     }
     function onclickadmin(){
+        document.getElementById('demos').style.display='none';
         document.getElementById('login').style.display='none';
         document.getElementById('desktop').style.display='none';
         document.getElementById('admin').style.display='block';
