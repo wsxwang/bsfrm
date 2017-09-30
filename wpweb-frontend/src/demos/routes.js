@@ -11,13 +11,13 @@ const routes=[
         icon: 'el-icon-more',
         children:[
 			{
-				path:'demosabout',
+				path:'/demos/demosabout',
 				component:demosabout,
 				name:'about',
 				icon: 'el-icon-share'
 			},
 			{
-				path:'sqlitegrid',
+				path:'/demos/sqlitegrid',
 				component:sqlitegrid,
 				name:'sqlite数据表格',
 				icon: 'el-icon-share'

@@ -1,18 +1,6 @@
 <template>
     <div id = "demos">
         <p>{{title}}</p>
-		<!--
-		 <header>
-		<router-link to="/demos">demos</router-link>
-		<br>
-		<router-link to="/demos/sqlitegrid">sqlitegrid</router-link>
-		<br>
-		<router-link to="/demos/demosabout">demosabout</router-link>
-		<br>
-		 </header>
-		<router-view></router-view> -->
-
-		
         <el-row class="container">
 			<el-col :span="6">
 				<el-menu  default-active="$router.options.routes[0].path" :router="true">
