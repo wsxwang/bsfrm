@@ -1,6 +1,6 @@
 
 import demos from "./demos.vue"
-import sqlitegrid from "./sqlitegrid.vue"
+import datagrid from "./datagrid.vue"
 import demosabout from "./demosabout.vue"
 
 const routes=[			
@@ -17,9 +17,9 @@ const routes=[
 				icon: 'el-icon-share'
 			},
 			{
-				path:'/demos/sqlitegrid',
-				component:sqlitegrid,
-				name:'sqlite数据表格',
+				path:'/demos/datagrid',
+				component:datagrid,
+				name:'数据表格',
 				icon: 'el-icon-share'
 			}
         ]
