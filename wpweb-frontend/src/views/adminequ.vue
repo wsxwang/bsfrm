@@ -1,5 +1,5 @@
 <template>
-    <div id='equadmin'>
+    <div>
         equadmin page
     </div>
 </template>

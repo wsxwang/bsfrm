@@ -5,8 +5,8 @@
                 <i class="el-icon-time"></i>
                 {{systitle}}
             </h3>
-            <el-form-item label="用户" prop="usr">
-                <el-input type="text" v-model="loginform.usr" auto-complete="off"></el-input>
+            <el-form-item label="用户" prop="user">
+                <el-input type="text" v-model="loginform.user" auto-complete="off"></el-input>
             </el-form-item>
             <el-form-item label="密码" prop="pwd">
                 <el-input type="password" v-model="loginform.pwd" auto-complete="off"></el-input>
@@ -20,18 +20,19 @@
 </template>
 
 <script>
+    import axios from "axios"
     export default{
         data() {
             return {
                 systitle: '欢迎登录',
                 //表单数据
                 loginform:{
-                    usr:'',
+                    user:'',
                     pwd:''
                 },
                 // 表单验证规则
                 rules:{
-                    usr: [
+                    user: [
                         { required: true, message: '请输入账号', trigger: 'blur' }
                         ],
                     pwd:[
@@ -42,7 +43,38 @@
         },
         methods:{
             onCommit:function () {
-                console.log(this.loginform.usr + ":" + this.loginform.pwd);
+                // 验证用户...
+                axios.get('/api/users')
+                    .then(function (response) {
+                        var found = false;
+                        for(var i in response.data)
+                        {
+                            if(response.data[i]['name'] == this.loginform.user)
+                            {
+                                found = true;
+                                if(response.data[i]['pwd'] == this.loginform.pwd) {
+                                    sessionStorage.setItem('userID', response.data[i]['guid']);
+                                    this.$store.commit('setUser', {
+                                        userID: response.data[i]['guid'],
+                                        userName: response.data[i]['name'],
+                                        userPwd: response.data[i]['pwd'],
+                                        });
+                                    this.$router.push({path: '/content'});
+                                }
+                                else{
+                                    alert("密码不正确");
+                                    break;
+                                }
+                            }
+                        }
+                        if (!found) {
+                            alert("用户不存在");
+                        }
+                    }.bind(this))
+                    .catch(function (error) {
+                        alert(error);
+                        console.log(error);
+                    });
             },
             onCancel:function (){
                 console.log("cancel");

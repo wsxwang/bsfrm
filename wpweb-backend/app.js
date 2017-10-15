@@ -5,11 +5,14 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var login = require('./routes/login');
+var users = require('./routes/users')
 var debug = require('./routes/debug');
-var desktop = require('./routes/desktop');
+var home = require('./routes/home');
+
+
+var login = require('./routes/login');
 var admin = require('./routes/admin');
-var demos = require('./routes/demos');
+var tasks = require('./routes/tasks');
 
 var app = express();
 
@@ -26,12 +29,25 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// 允许跨域访问
+app.use('/', function(req,res,next){
+	res.header("Access-Control-Allow-Origin", "*");
+    res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+	next();
+});
+app.use('/api/users', users);
+app.use('/debug', debug);
+app.use('/', home);
+
+
+
+
 app.use('/', login);
 app.use('/login', login);
-app.use('/debug', debug);
-app.use('/desktop', desktop);
 app.use('/admin', admin);
-app.use('/demos', demos);
+app.use('/tasks', tasks);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -50,5 +66,7 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+
 
 module.exports = app;
