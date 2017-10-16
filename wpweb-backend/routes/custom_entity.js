@@ -7,44 +7,51 @@ var api = require(path.join(__dirname, '../src/api/custom_entity'));
 var handelInfo=function(info, err) {
 }
 
-/* webservice:自定义实体. */
+/* webservice: custom entity and its fields. */
 
 // get all
 router.get('/', function(req, res, next) {
     res.header('Content-Type', 'application/json;charset=utf-8');
-    res.json(mgr.allUsers());
+    res.json(api.readAllFromStore());
 });
 
-// find user，参数是用户id的字符串
+// find ，parameter is ID
 router.get('/:id', function (req, res, next) {
     res.header('Content-Type', 'application/json;charset=utf-8');
-    res.json(mgr.userByID(req.params['id']));
+    res.status(400);
+    res.json({message:"not implemented"});
+    res.end();
 })
 
-// add user
+// add
 router.post('/', function (req,res,next) {
-    mgr.addUser(req.body);
+    api.UpdateToStore(req.body);
     res.header('Content-Type', 'application/json;charset=utf-8');
-    res.json({status:"success", message:"add user success"});
+    res.status(201);
+    res.json({message:"add success"});
 })
 
 // delete user
 router.delete('/:id', function (req,res,next) {
-    mgr.delUser(req.param('id'));
+    api.del(req.param('id'));
     res.header('Content-Type', 'application/json;charset=utf-8');
-    res.json({status:"success", message:"delete user success"});
+    res.status(204);
+    res.json({message:"delete success"});
 })
 
 // modify user
 router.put('/', function (req,res,next) {
-	mgr.modifyUser(req.body);
+    api.UpdateToStore(req.body);
     res.header('Content-Type', 'application/json;charset=utf-8');
-    res.json({status:"success", message:"modify user success"});
+    res.status(201);
+    res.json({message:"modify success"});
 })
 
 // options
 router.options('/', function (req,res,next) {
-	next();
+    res.header('Content-Type', 'application/json;charset=utf-8');
+    res.status(400);
+    res.json({message:"not implemented"});
 })
 
 

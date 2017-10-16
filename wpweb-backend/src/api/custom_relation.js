@@ -1,0 +1,9 @@
+/*
+自定义关系的api，涉及到元数据表：TBL_meta_RelationDefine
+TBL_meta_RelationDefine
+    ID:唯一标识
+    label:显示名称
+    EID1:实体1ID
+    EID2:实体2ID
+数据表命名：TBL_Relation_RID
+ */

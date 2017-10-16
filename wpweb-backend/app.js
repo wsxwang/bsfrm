@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 
 // route to restful api
 var custom_entity = require('./routes/custom_entity');
+var custom_relation = require('./routes/custom_relation');
 var users = require('./routes/users');
 // route to page
 var debug = require('./routes/debug');
@@ -45,12 +46,10 @@ app.use('/', function(req,res,next){
 });
 
 app.use('/api/custom_entity', custom_entity);
+//app.use('/api/custom_relation', custom_relation);
 app.use('/api/users', users);
 app.use('/debug', debug);
 app.use('/', home);
-
-
-
 
 app.use('/', login);
 app.use('/login', login);
