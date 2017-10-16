@@ -14,17 +14,24 @@ TBL_meta_EntityFieldDefine
 
 //  从持久化存储中读取所有记录
 var readAllFromStore=function () {
+	console.log('readAllFromStore');
     return [];
+};
+
+// 从持久化存储中查找一条记录
+var readOneFromStore=function(id){
+	console.log('readOneFromStore' + id);
+	return null;
 };
 
 // 向持久化存储中更新一条记录，若ID不存在则新增
 var UpdateToStore=function(record){
-
+	console.log('UpdateToStore' + record.toString());
 }
 
 // 从持久化存储中删除一条记录（根据id）
 var delFromStore=function (id) {
-
+	console.log('delFromStore' + id);
 }
 
 // 判断记录（json格式）是否格式合法
@@ -48,6 +55,7 @@ var clone=function (o) {
 
 module.exports={
     readAllFromStore,
+	readOneFromStore,
     UpdateToStore,
     delFromStore,
     isValidRecord,

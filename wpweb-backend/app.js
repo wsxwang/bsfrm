@@ -23,10 +23,14 @@ var tasks = require('./routes/tasks');
 
 var app = express();
 
-// 不使用模板渲染
+// 模板渲染改为ejs
 // view engine setup
 //app.set('views', path.join(__dirname, 'views'));
 //app.set('view engine', 'jade');
+// ejs
+app.set('views', path.join(__dirname, 'public/htmls'));
+app.engine('html', require('ejs').renderFile);
+app.set("view engine", "html"); 
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -71,6 +75,9 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
+  
+  //... 错误处理未记录日志
+  console.error(err);
   res.render('error');
 });
 
