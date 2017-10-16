@@ -5,9 +5,15 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var users = require('./routes/users')
+// route to restful api
+var custom_entity = require('./routes/custom_entity');
+var users = require('./routes/users');
+// route to page
 var debug = require('./routes/debug');
 var home = require('./routes/home');
+
+
+
 
 
 var login = require('./routes/login');
@@ -37,6 +43,8 @@ app.use('/', function(req,res,next){
     res.header('Access-Control-Allow-Headers', 'Content-Type');
 	next();
 });
+
+app.use('/api/custom_entity', custom_entity);
 app.use('/api/users', users);
 app.use('/debug', debug);
 app.use('/', home);
