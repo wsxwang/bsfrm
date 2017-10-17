@@ -30,13 +30,16 @@ JSON格式：{
 -----------------------------
 数据表命名：TBL_Entity_EID
  */
- var fs=require("fs")
+ var assert=require('assert');
+ var fs=require("fs");
  var path = require('path');
+ var sqlite3=require('sqlite3');
 
-const c_fileName = path.join(__dirname, '../../public/db/TBL_meta_EntityDefine.json')
+//const fileName_entity = path.join(__dirname, '../../public/db/TBL_meta_EntityDefine.json')
+const fileName_entity = path.join(__dirname, '../../public/db/TBL_meta_EntityDefine.db')
 
- var readall=function (fileName) {
-	 var ret = [];
+var readall=function (fileName) {
+	var ret = [];
     var str = fs.readFileSync(fileName).toString();
     var record = str.split("\n");
     for (i in record){
@@ -59,56 +62,99 @@ var writeall=function (records, fileName) {
 
 
 
-//  从持久化存储中读取所有元数据记录
-var metaReadAllFromStore=function () {
-	console.log('readAllFromStore');
-	var allEntity = readall(c_fileName);
-    return allEntity;
+/*
+从持久化存储中读取所有元数据记录，调用handle函数处理
+handle=function(error, allRecords){}
+*/
+var metaReadAllFromStore=function (handle) {
+	assert(typeof(handle)=='function');
+	/*
+	var sqlStr = 'SELECT ID,label from TBL_meta_EntityDefine';
+	new sqlite3.Database(fileName_entity).all(sqlStr, function(err, res){
+		handle(err, res);
+	});
+	
+	*/
+	
+	
+	
+	handle(null, readall(c_fileName));
 };
 
-// 从持久化存储中查找一条元数据记录
-var metaReadOneFromStore=function(id){
-	console.log('readOneFromStore' + id);
-	var allEntity = metaReadAllFromStore();
-	var index = indexInEntity(allEntity, id);
-	if(index >= 0){
-		return allEntity[index];
-	}
-
-	return null;
+/*
+从持久化存储中查找一条元数据记录
+handle=function(error, foundItem){}
+*/
+var metaReadOneFromStore=function(id, handle){
+	assert(typeof(handle)=='function');
+	metaReadAllFromStore(function(err, allEntity){
+		if(err != null){
+			handle(err);
+		}else{
+			assert(allEntity != null);
+			var index = indexInEntity(allEntity, id);
+			if(index >= 0){
+				handle(null, allEntity[index]);
+			}
+			else{
+				handle(null, null);
+			}
+		}
+	});
 };
 
-// 向持久化存储中更新一条元数据记录，若ID不存在则新增，若参数不合法则返回false，否则返回true
-var metaUpdateToStore=function(record){
-	console.log('UpdateToStore' + record.toString());
+/*
+向持久化存储中更新一条元数据记录，若ID不存在则新增，若参数不合法则返回false，否则返回true
+handle=function(err){}
+*/
+var metaUpdateToStore=function(record, handle){
+	assert(typeof(handle)=='function');
 	if (metaIsValidRecord(record) == false){
-		return false;
+		handle(new Error('format error:'));
 	};
-	var allEntity = metaReadAllFromStore();
-	var index = indexInEntity(allEntity, record['ID']);
-	if(index < 0){
-		allEntity.push(record);
-	}
-	else{
-		allEntity[index] = record;
-	}
-	writeall(allEntity, c_fileName);
+	metaReadAllFromStore(function(err, allEntity){
+		if(err != null){
+			handle(err);
+		}else{
+			assert(allEntity != null);
+			var index = indexInEntity(allEntity, record['ID']);
+			if(index >= 0){
+				allEntity[index] = record;
+			}
+			else{
+				allEntity.push(record);
+			}
+			writeall(allEntity, c_fileName);
+			handle(null);
+		}
+	});
 }
 
-// 从持久化存储中删除一条元数据记录（根据id），若id不存在不做任何事
-var metaDelFromStore=function (id) {
-	console.log('delFromStore' + id);
-	var allEntity = metaReadAllFromStore();
-	var index = indexInEntity(allEntity, id);
-	if(index >=0){
-		console.log("found " + index.toString());
-		allEntity.splice(index, 1);
-		writeall(allEntity, c_fileName);
-	}
+/*
+从持久化存储中删除一条元数据记录（根据id），若id不存在不做任何事
+handle=function(err){}
+*/
+var metaDelFromStore=function (id, handle) {
+	assert(typeof(handle)=='function');
+	metaReadAllFromStore(function(err, allEntity){
+		if(err!=null){
+			handle(err);
+		}else{
+			assert(allEntity != null);
+			var index = indexInEntity(allEntity, id);
+			if(index >= 0){
+				allEntity.splice(index, 1);
+				writeall(allEntity, c_fileName);
+			}
+			handle(null);
+		}
+	});
 }
 
-// 判断记录（json格式）是否格式合法
-// 不检测ID是否重复
+/*
+判断记录（json格式）是否格式合法
+不检测ID是否重复
+*/
 var metaIsValidRecord=function (record) {
     if (record == null) {
         return false;
@@ -119,7 +165,7 @@ var metaIsValidRecord=function (record) {
     if ((record['label'] == null) || record['label'] == '') {
         return false;
     }
-	// check fields
+	// check fields...
     return true;
 }
 
