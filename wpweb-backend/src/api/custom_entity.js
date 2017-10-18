@@ -16,47 +16,73 @@ TBL_meta_EntityFieldDefine:实体字段元数据定义
 	name:字段名，必填
     label:显示名称
     type:单选：string,number,password,必填
-    constraint:多选（逗号隔开）：unique,required
+    constraints:多选（逗号隔开）：unique,required
 JSON格式：{
 	EID:'xxx',		// api对外不公开
 	ID:'xxx',
 	name:'xxx',
 	label:'xxx',
 	type:'xxx',
-	constraint:'xxx,xxx',
+	constraints:'xxx,xxx',
 }
 -----------------------------
-持久化：采用json对象序列化与反序列化为文件，所有实体及字段序列化为TBL_meta_EntityDefine.json一个文件
+持久化：sqlite数据库文件：../../public/db/TBL_meta_data.db
 -----------------------------
 数据表命名：TBL_Entity_EID
- */
+-----------------------------
+异常处理：抛出
+*/
  var assert=require('assert');
  var fs=require("fs");
  var path = require('path');
  var sqlite3=require('sqlite3');
 
-//const fileName_entity = path.join(__dirname, '../../public/db/TBL_meta_EntityDefine.json')
-const fileName_entity = path.join(__dirname, '../../public/db/TBL_meta_EntityDefine.db')
+const fileName_db = path.join(__dirname, '../../public/db/TBL_meta_data.db')
+const sqlCreateEntity = "CREATE TABLE IF NOT EXISTS TBL_meta_EntityDefine (ID varchar2(255), label varchar2(255))";
+const sqlCreateFields = "CREATE TABLE IF NOT EXISTS TBL_meta_EntityFieldDefine (EID varchar2(255), ID varchar2(255), name varchar2(255), label varchar2(255), type varchar2(255), constraints varchar2(255))";
 
-var readall=function (fileName) {
-	var ret = [];
-    var str = fs.readFileSync(fileName).toString();
-    var record = str.split("\n");
-    for (i in record){
-        if (record[i].length > 2){
-            ret.push(JSON.parse(record[i]));
-        }
-    }
-	return ret;
-}
+/*
+从持久化存储中读取实体元数据定义，不包含字段定义
+handle=function(allRecords){}
+*/
+var metaReadAllEntityFromStore=function(handle){
+	assert(typeof(handle)=='function');
+	var sqlStr = "";
+	var db =new sqlite3.Database(fileName_db);	
+	// serialize可保证回调函数中的db.xxx操作顺序执行，但是不保证回调函数中其他代码顺序执行！！！！
+	db.serialize(function() {
+		sqlStr = sqlCreateEntity+";"+sqlCreateFields;
+		db.exec(sqlStr);
+		
+		sqlStr = "SELECT ID,label from TBL_meta_EntityDefine";
+		db.all(sqlStr, function(err, rows) {
+			if(err!=null){
+				throw err;
+			}
+			allRecords = rows;
+		});
+		
+		sqlStr = "SELECT EID,ID,name,label,type,constraints from TBL_meta_EntityFieldDefine";
+		db.all(sqlStr, function(err, rows){
+			if(err!=null){
+				throw err;
+			}
+			for(var j in rows){
+				for(var i in allRecords){
+					if(allRecords[i].ID == rows[j].EID){
+						if(allRecords[i]['fields']==null){allRecords[i]['fields']=[];}
+						allRecords[i]['fields'].push(rows[j]);
+						break;
+					}
+				}
+			}
+			handle(null, allRecords);
+		});
+	});
+	db.close();
+};
 
-var writeall=function (records, fileName) {
-    var s = "";
-    for(i in records){
-        s += JSON.stringify(records[i]) + "\n";
-    }
-    fs.writeFileSync(fileName, s);
-}
+
 
 
 
@@ -64,91 +90,171 @@ var writeall=function (records, fileName) {
 
 /*
 从持久化存储中读取所有元数据记录，调用handle函数处理
-handle=function(error, allRecords){}
+handle=function(allRecords){}
 */
 var metaReadAllFromStore=function (handle) {
 	assert(typeof(handle)=='function');
-	/*
-	var sqlStr = 'SELECT ID,label from TBL_meta_EntityDefine';
-	new sqlite3.Database(fileName_entity).all(sqlStr, function(err, res){
-		handle(err, res);
+	var allRecords = [];
+	var sqlStr = "";
+	var db =new sqlite3.Database(fileName_db);
+	// serialize可保证回调函数中的db.xxx操作顺序执行，但是不保证回调函数中其他代码顺序执行！！！！
+	db.serialize(function() {
+		sqlStr = sqlCreateEntity+";"+sqlCreateFields;
+		db.exec(sqlStr);
+		
+		sqlStr = "SELECT ID,label from TBL_meta_EntityDefine";
+		db.all(sqlStr, function(err, rows) {
+			if(err!=null){
+				throw err;
+			}
+			allRecords = rows;
+		});
+		
+		sqlStr = "SELECT EID,ID,name,label,type,constraints from TBL_meta_EntityFieldDefine";
+		db.all(sqlStr, function(err, rows){
+			if(err!=null){
+				throw err;
+			}
+			for(var j in rows){
+				for(var i in allRecords){
+					if(allRecords[i].ID == rows[j].EID){
+						if(allRecords[i]['fields']==null){allRecords[i]['fields']=[];}
+						allRecords[i]['fields'].push(rows[j]);
+						break;
+					}
+				}
+			}
+			handle(null, allRecords);
+		});
 	});
-	
-	*/
-	
-	
-	
-	handle(null, readall(c_fileName));
+	db.close();
 };
 
 /*
 从持久化存储中查找一条元数据记录
-handle=function(error, foundItem){}
+handle=function(foundItem){}
 */
 var metaReadOneFromStore=function(id, handle){
 	assert(typeof(handle)=='function');
-	metaReadAllFromStore(function(err, allEntity){
-		if(err != null){
-			handle(err);
-		}else{
-			assert(allEntity != null);
-			var index = indexInEntity(allEntity, id);
-			if(index >= 0){
-				handle(null, allEntity[index]);
+	var foundItem = null;
+	var sqlStr = "";
+	var db =new sqlite3.Database(fileName_db);
+	// serialize可保证回调函数中的db.xxx操作顺序执行，但是不保证回调函数中其他代码顺序执行！！！！
+	db.serialize(function() {
+		sqlStr = sqlCreateEntity+";"+sqlCreateFields;
+		db.exec(sqlStr);
+		
+		sqlStr = "SELECT ID,label FROM TBL_meta_EntityDefine WHERE ID='" + id + "'";
+		db.all(sqlStr, function(err, rows) {
+			if(err!=null){
+				throw err;
 			}
-			else{
-				handle(null, null);
+			foundItem=rows[0];
+		});
+		
+		sqlStr = "SELECT EID,ID,name,label,type,constraints FROM TBL_meta_EntityFieldDefine WHERE EID='" + id +"'";
+		db.all(sqlStr, function(err, rows){
+			if(err!=null){
+				throw err;
 			}
-		}
+			if(foundItem != null){
+				for(var j in rows){
+					if(foundItem.ID == rows[j].EID){
+						if(foundItem['fields']==null){foundItem['fields']=[];}
+						foundItem['fields'].push(rows[j]);
+					}
+				}
+			}
+			handle(null, foundItem);
+		});
 	});
+	db.close();
 };
 
 /*
-向持久化存储中更新一条元数据记录，若ID不存在则新增，若参数不合法则返回false，否则返回true
-handle=function(err){}
+向持久化存储中更新一条元数据记录，若ID不存在则不做操作
 */
-var metaUpdateToStore=function(record, handle){
-	assert(typeof(handle)=='function');
+var metaUpdateToStore=function(record){
 	if (metaIsValidRecord(record) == false){
-		handle(new Error('format error:'));
-	};
-	metaReadAllFromStore(function(err, allEntity){
-		if(err != null){
-			handle(err);
-		}else{
-			assert(allEntity != null);
-			var index = indexInEntity(allEntity, record['ID']);
-			if(index >= 0){
-				allEntity[index] = record;
-			}
-			else{
-				allEntity.push(record);
-			}
-			writeall(allEntity, c_fileName);
-			handle(null);
+		throw new Error('format error:');
+	}
+	var sqlStr = "";
+	var db =new sqlite3.Database(fileName_db);
+	// serialize可保证回调函数中的db.xxx操作顺序执行，但是不保证回调函数中其他代码顺序执行！！！！
+	db.serialize(function() {
+		sqlStr = sqlCreateEntity+";"+sqlCreateFields;
+		db.exec(sqlStr);
+		
+		db.run("UPDATE TBL_meta_EntityDefine SET label=? WHERE ID='?'", record['label'], record['ID']);
+		db.run("DELETE FROM TBL_meta_EntityFieldDefine WHERE EID='?'", record['ID']);
+		sqlStr = "";
+		for(var i in record['fields']){
+			sqlStr += "INSERT INTO TBL_meta_EntityFieldDefine (EID,ID,name,label,type,constraints) VALUES('"
+				+ record['ID'] + "','"
+				+ record['fields'][i]['ID'] + "','"
+				+ record['fields'][i]['name'] + "','"
+				+ record['fields'][i]['label'] + "','"
+				+ record['fields'][i]['type'] + "','"
+				+ record['fields'][i]['constraints'] + "');"
 		}
+		db.exec(sqlStr);
 	});
+	db.close();
+}
+
+/*
+向持久化存储中插入一条元数据记录，若ID存在则抛出异常
+*/
+var metaAddToStore=function(record){
+	if (metaIsValidRecord(record) == false){
+		throw new Error('format error:');
+	}
+	var sqlStr = "";
+	var db =new sqlite3.Database(fileName_db);
+	// serialize可保证回调函数中的db.xxx操作顺序执行，但是不保证回调函数中其他代码顺序执行！！！！
+	db.serialize(function() {
+		sqlStr = sqlCreateEntity+";"+sqlCreateFields;
+		db.exec(sqlStr);
+
+		sqlStr = "SELECT ID,label FROM TBL_meta_EntityDefine WHERE ID='" + record['ID'] + "'";
+		db.each(sqlStr, function(err, row) {
+			if(err!=null){
+				throw err;
+			}
+			throw new Error('record already exists!');
+		});
+		
+		db.run("INSERT INTO TBL_meta_EntityDefine (ID, label) VALUES('?','?')", record['ID'], record['label']);
+		sqlStr = "";
+		for(var i in record['fields']){
+			sqlStr += "INSERT INTO TBL_meta_EntityFieldDefine (EID,ID,name,label,type,constraints) values('"
+				+ record['ID'] + "','"
+				+ record['fields'][i]['ID'] + "','"
+				+ record['fields'][i]['name'] + "','"
+				+ record['fields'][i]['label'] + "','"
+				+ record['fields'][i]['type'] + "','"
+				+ record['fields'][i]['constraints'] + "');"
+		}
+		db.exec(sqlStr);
+	});
+	db.close();
 }
 
 /*
 从持久化存储中删除一条元数据记录（根据id），若id不存在不做任何事
-handle=function(err){}
 */
-var metaDelFromStore=function (id, handle) {
-	assert(typeof(handle)=='function');
-	metaReadAllFromStore(function(err, allEntity){
-		if(err!=null){
-			handle(err);
-		}else{
-			assert(allEntity != null);
-			var index = indexInEntity(allEntity, id);
-			if(index >= 0){
-				allEntity.splice(index, 1);
-				writeall(allEntity, c_fileName);
-			}
-			handle(null);
-		}
+var metaDelFromStore=function (id) {
+	var sqlStr = "";
+	var db =new sqlite3.Database(fileName_db);
+	// serialize可保证回调函数中的db.xxx操作顺序执行，但是不保证回调函数中其他代码顺序执行！！！！
+	db.serialize(function() {
+		sqlStr = sqlCreateEntity+";"+sqlCreateFields;
+		db.exec(sqlStr);
+
+//		db.run("DELETE from TBL_meta_EntityDefine where ID='?'", id);
+		db.run("DELETE FROM TBL_meta_EntityFieldDefine WHERE EID='?'", id);
 	});
+	db.close();
 }
 
 /*
@@ -182,6 +288,7 @@ module.exports={
     metaReadAllFromStore,
 	metaReadOneFromStore,
     metaUpdateToStore,
+	metaAddToStore,
     metaDelFromStore,
     metaIsValidRecord,
 };
