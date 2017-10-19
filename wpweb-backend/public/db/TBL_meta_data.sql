@@ -1,0 +1,2 @@
+CREATE TABLE IF NOT EXISTS TBL_meta_EntityDefine (ID varchar2(255), name varchar2(256), label varchar2(255));
+CREATE TABLE IF NOT EXISTS TBL_meta_EntityFieldDefine (EID varchar2(255), ID varchar2(255), name varchar2(255), label varchar2(255), type varchar2(255), constraints varchar2(255))
