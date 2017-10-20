@@ -8,13 +8,6 @@ import login from "./views/login.vue"
 
 const routes=[
     {
-        path: '/debug',
-        component:debug,
-        name: 'debug',
-        icon: 'el-icon-more',
-		hidden:false,
-    },
-    {
         path: '/login',
         component:login,
         name: 'login',
@@ -71,6 +64,13 @@ const routes=[
 			}
 		]
 	},
+    {
+        path: '/debug',
+        component:debug,
+        name: 'debug',
+        icon: 'el-icon-more',
+		hidden:false,
+    },
 
 ]
 

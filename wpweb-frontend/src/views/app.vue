@@ -4,9 +4,7 @@
     </div>
 </template>
 
-<script>
-	import navpanel from "./nav.vue"
-	
+<script>	
     export default {
         data() {
             return {
@@ -14,7 +12,6 @@
             };
         },
 		components:{
-			navpanel
 		}
     }
 </script>

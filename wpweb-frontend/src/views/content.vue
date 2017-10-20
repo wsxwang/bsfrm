@@ -1,6 +1,6 @@
 <template>
     <div>
-        <navpanel></navpanel>
+        <nav_panel></nav_panel>
         <router-view>
             <router-view></router-view>
         </router-view>
@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import navpanel from "./nav.vue"
+import nav_panel from "./nav_panel.vue"
 
 export default {
     data() {
@@ -18,7 +18,7 @@ export default {
         };
     },
     components:{
-        navpanel
+        nav_panel
     }
 }
 </script>
