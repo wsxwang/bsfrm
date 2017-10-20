@@ -56,7 +56,6 @@ var allEntity=function () {
 // 从元数据库中读取所有字段定义，返回数组
 var allFields=function () {
     var ret = dbOpr.exec_sync(fileName_db, 'SELECT EID,ID,name,label,type,constraints FROM TBL_meta_EntityFieldDefine');
-    console.log(ret);
     if('error' in ret){
         throw ret;
     }
@@ -75,7 +74,6 @@ var entityByID=function (id) {
 // 从元数据库中根据实体ID查找对应的字段定义，返回数组
 var fieldsByEID=function (eid) {
     var ret = dbOpr.exec_sync(fileName_db, "SELECT EID,ID,name,label,type,constraints FROM TBL_meta_EntityFieldDefine WHERE EID='" + eid + "'");
-    console.log(ret);
     if('error' in ret){
         throw ret;
     }
@@ -85,7 +83,6 @@ var fieldsByEID=function (eid) {
 // 从元数据库中根据字段ID查找对应的字段定义
 var fieldByID=function (id) {
     var ret = dbOpr.exec_sync(fileName_db, "SELECT EID,ID,name,label,type,constraints FROM TBL_meta_EntityFieldDefine WHERE ID='" + id + "'");
-    console.log(ret);
     if('error' in ret){
         throw ret;
     }

@@ -20,7 +20,7 @@ useage:
 component custom_er:custom entity-relation model
     /src/api/custom_entity.js: custom entity api
     /src/api/custom_relation.js: custom entity api
-    /routes/custom_entity.js: route restful api "http://xxx/api/custom_entity"
+    /routes/custom_entity.js: route restful api "http://xxx/api/custom_entity", "http://xxx/api/custom_entity/:entityID/fields", "http://xxx/api/custom_entity/fields"
     /routes/custom_relation.js: route restful api "http://xxx/api/custom_relation"
     /test/custom_er_Test.js: test script
 

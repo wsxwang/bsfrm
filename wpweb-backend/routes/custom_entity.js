@@ -9,7 +9,7 @@ var handelInfo=function(info, err) {
 
 /* webservice: custom entity and its fields. */
 
-// get all
+// get all, return [{},{},...]
 router.get('/', function(req, res, next) {
     res.header('Content-Type', 'application/json;charset=utf-8');
     try {
@@ -19,8 +19,12 @@ router.get('/', function(req, res, next) {
     }
 });
 
-// find ，parameter is ID
+// find ，parameter is ID, return {}
 router.get('/:id', function (req, res, next) {
+    if(req.params.id == 'fields'){
+        next();
+        return;
+    }
     res.header('Content-Type', 'application/json;charset=utf-8');
     try {
         res.json(api.entityByID(req.params.id));
@@ -70,10 +74,8 @@ router.options('/', function (req,res,next) {
 
 //////////////////////////////////////////////////////////////////////////////////
 //fields
-// get all
-//... 路由不到这里！！！
-router.get("/'fields'", function(req, res, next) {
-    console.log("aaa");
+// get all, return [{},{},...]
+router.get("/fields", function(req, res, next) {
     res.header('Content-Type', 'application/json;charset=utf-8');
     try {
         res.json(api.allFields());
@@ -81,7 +83,7 @@ router.get("/'fields'", function(req, res, next) {
         res.status(500).json(e);
     }
 });
-// find ，parameter is ID
+// find ，parameter is ID, return {}
 router.get('/fields/:id', function (req, res, next) {
     res.header('Content-Type', 'application/json;charset=utf-8');
     try {
@@ -90,9 +92,9 @@ router.get('/fields/:id', function (req, res, next) {
         res.status(500).json(e);
     }
 })
-// find ，parameter is EID
-//... 路由不到这里！！！
-router.get('/fields/:eid', function (req, res, next) {
+
+// find ，parameter is EID, return [{},{},...]
+router.get('/:eid/fields/', function (req, res, next) {
     res.header('Content-Type', 'application/json;charset=utf-8');
     try {
         res.json(api.fieldsByEID(req.params.eid));
@@ -101,4 +103,46 @@ router.get('/fields/:eid', function (req, res, next) {
     }
 })
 
+// add, parameter is [{},{}]
+router.post('/fields/', function (req,res,next) {
+    res.header('Content-Type', 'application/json;charset=utf-8');
+    try {
+        api.insertFields(req.body);
+        res.status(201).json({message:"add success"});
+    }catch (e){
+        res.status(500).json(e);
+    }
+})
+
+// delete , parameter is id
+router.delete('/fields/:id', function (req,res,next) {
+    res.header('Content-Type', 'application/json;charset=utf-8');
+    try {
+        api.delField(req.params.id);
+        res.status(204).json({message:"delete success"});
+    }catch (e){
+        res.status(500).json(e);
+    }
+})
+
+// delete , parameter is entity id
+router.delete('/:eid/fields/', function (req,res,next) {
+    res.header('Content-Type', 'application/json;charset=utf-8');
+    try {
+        api.delFieldsByEID(req.params.eid);
+        res.status(204).json({message:"delete success"});
+    }catch (e){
+        res.status(500).json(e);
+    }
+})
+// modify , parameter is [{},{},...]
+router.put('/fields/', function (req,res,next) {
+    res.header('Content-Type', 'application/json;charset=utf-8');
+    try {
+        api.updateFields(req.body);
+        res.status(201).json({message:"modify success"});
+    }catch (e){
+        res.status(500).json(e);
+    }
+})
 module.exports = router;
