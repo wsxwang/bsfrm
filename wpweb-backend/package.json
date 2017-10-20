@@ -13,9 +13,11 @@
     "debug": "~2.6.3",
     "ejs": "^2.5.7",
     "express": "~4.15.2",
-    "jade": "~1.11.0",
+    "file-stream-rotator": "^0.2.0",
+    "fs": "^0.0.1-security",
     "morgan": "~1.8.1",
     "serve-favicon": "~2.4.2",
+    "sqlite-sync": "^0.3.6",
     "sqlite3": "^3.1.13"
   },
   "devDependencies": {

@@ -4,6 +4,8 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var FileStreamRotator = require('file-stream-rotator');
+var fs = require('fs');
 
 // route to restful api
 var custom_entity = require('./routes/custom_entity');
@@ -34,7 +36,22 @@ app.set("view engine", "html");
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+
+// 更改日志记录
 app.use(logger('dev'));
+// 按天分日志文件
+/*
+var logDirectory = path.join(__dirname, 'log');
+fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory);
+var accessLogStream = FileStreamRotator.getStream({
+  date_format: 'YYYYMMDD',
+  filename: path.join(logDirectory, 'access-%DATE%.log'),
+  frequency: 'daily',
+  verbose: false
+});
+app.use(logger('short',{stream:accessLogStream}));
+*/
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
