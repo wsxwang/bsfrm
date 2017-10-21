@@ -5,7 +5,7 @@ import apiBase from "../api/apiBase";
         <el-row>
             <el-button @click="refresh">刷新</el-button>
             <el-button @click="addUser">添加</el-button>
-            <el-button @click="delUser">删除</el-button>
+            <el-button @click="delUser">删除选中</el-button>
         </el-row>
         <el-row>
             <el-col :span="8">

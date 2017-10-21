@@ -3,6 +3,7 @@ import projectMgr from "./views/projectMgr.vue"
 import taskMgr from "./views/taskMgr.vue"
 import adminusr from "./views/adminusr.vue"
 import adminequ from "./views/adminequ.vue"
+import adminCustom from "./views/adminCustom.vue"
 import debug from "./views/debug.vue"
 import login from "./views/login.vue"
 
@@ -48,6 +49,13 @@ const routes=[
 		icon: 'el-icon-setting',
         auth:true,
 		children:[
+            {
+                path:'/content/adminCustom',
+                component:adminCustom,
+                name:'定制管理',
+                icon: 'el-icon-setting',
+                auth:true,
+            },
 			{
 				path:'/content/adminusr',
 				component:adminusr,

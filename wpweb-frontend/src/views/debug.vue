@@ -14,19 +14,18 @@
         </div>
         <div>
             <p>vue组件测试
-				<el-select v-model="chosenVue" placeholder="...">
+			    <el-select v-model="chosenVue" placeholder="...">
 					<el-option v-for="item in vueNames" :key="item" :label="item" :value="item"></el-option>
 				</el-select>
-				<h1>{{chosenVue=='adminequ'?'display:block':'display:none'}}</h1>
-				
-				 <div :style="chosenVue=='adminequ'?'display:block':'display:none'"><adminequ></adminequ></div>
-				 <div :style="chosenVue=='adminusr'?'display:block':'display:none'"><adminusr></adminusr></div>
-				 <div :style="chosenVue=='login'?'display:block':'display:none'"><login></login></div>
-				 <div :style="chosenVue=='nav_panel'?'display:block':'display:none'"><nav_panel></nav_panel></div>
-				 <div :style="chosenVue=='projectBaseInfo'?'display:block':'display:none'"><projectBaseInfo></projectBaseInfo></div>
-				 <div :style="chosenVue=='projectMgr'?'display:block':'display:none'"><projectMgr></projectMgr></div>
-				 <div :style="chosenVue=='taskDetail'?'display:block':'display:none'"><taskDetail></taskDetail></div>
-				 <div :style="chosenVue=='taskMgr'?'display:block':'display:none'"><taskMgr></taskMgr></div>
+			    <div :style="chosenVue=='adminCustom'?'display:block':'display:none'"><adminCustom></adminCustom></div>
+                <div :style="chosenVue=='adminequ'?'display:block':'display:none'"><adminequ></adminequ></div>
+				<div :style="chosenVue=='adminusr'?'display:block':'display:none'"><adminusr></adminusr></div>
+				<div :style="chosenVue=='login'?'display:block':'display:none'"><login></login></div>
+				<div :style="chosenVue=='nav_panel'?'display:block':'display:none'"><nav_panel></nav_panel></div>
+				<div :style="chosenVue=='projectBaseInfo'?'display:block':'display:none'"><projectBaseInfo></projectBaseInfo></div>
+				<div :style="chosenVue=='projectMgr'?'display:block':'display:none'"><projectMgr></projectMgr></div>
+				<div :style="chosenVue=='taskDetail'?'display:block':'display:none'"><taskDetail></taskDetail></div>
+				<div :style="chosenVue=='taskMgr'?'display:block':'display:none'"><taskMgr></taskMgr></div>
 			</p>
         </div>
         <div id="autotest">
@@ -36,6 +35,7 @@
 
 <script>
     import axios from "axios"
+    import adminCustom from "./adminCustom.vue"
 	import adminequ from "./adminequ.vue"
 	import adminusr from "./adminusr.vue"
 	import login from "./login.vue"
@@ -54,8 +54,9 @@ export default {
             restfulParam:'',
             resInfo:'',
 			
-			chosenVue:'adminequ',
+			chosenVue:'adminCustom',
 			vueNames:[
+			    'adminCustom',
 				'adminequ',
 				'adminusr',
 				'login',
@@ -129,6 +130,7 @@ export default {
         },
     },
 	components:{
+        adminCustom,
 		adminequ,
 		adminusr,
 		login,

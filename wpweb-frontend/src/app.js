@@ -4,6 +4,8 @@ import VueRouter from 'vue-router'
 import elementui from 'element-ui'
 import 'element-ui/lib/theme-default/index.css'
 import axios from "axios"
+import VueContextMenu from 'vue-contextmenu'
+import 'vue-contextmenu/style/css/font-awesome.min.css'
 import store from './store/index'
 import app from './views/app.vue'
 import routes from './routes'
@@ -13,6 +15,7 @@ axios.defaults.baseURL='http://localhost:3000/';
 
 Vue.use(Vuex);
 Vue.use(elementui);
+Vue.use(VueContextMenu);
 Vue.use(VueRouter);
 
 const router = new VueRouter({
