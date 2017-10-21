@@ -3,7 +3,7 @@
         <el-tabs activeName="custom_entity">
             <el-tab-pane key="custom_entity" label="实体定义" name="custom_entity">
                 <el-row>
-                    <div @contextmenu="showMenu">
+                    <div @contextmenu="showMenu_entiryTree">
                         <VueContextMenu :contextMenuData="entityTreeContextMenu" @refresh="refreshEntity" @add="addEntity" @del="delEntity">
                         </VueContextMenu>
                         <el-col :span="6">
@@ -15,14 +15,21 @@
                         <el-tabs activeName="entityDetail">
                             <el-tab-pane label="实体信息" name="entityDetail">
                                 <el-form  label-width="100px" clas ="entityDetail" :model="entityDetailForm" :rules="entityDetailRules">
-                                    <el-form-item label="编号" label-width="100px" title="aaa"><el-input :value="entityDetailForm.ID" :disabled="true"></el-input></el-form-item>
-                                    <el-form-item label="表名" label-width="100px" prop="name"><el-input v-model="entityDetailForm.name"></el-input></el-form-item>
+                                    <el-form-item label="编号" label-width="100px" title="编号为空表示新增"><el-input :value="entityDetailForm.ID" :disabled="true"></el-input></el-form-item>
+                                    <el-form-item label="表名" label-width="100px" prop="name" title="不能重复！！！"><el-input v-model="entityDetailForm.name"></el-input></el-form-item>
                                     <el-form-item label="显示" label-width="100px" prop="label"><el-input v-model="entityDetailForm.label"></el-input></el-form-item>
                                     <el-form-item><el-button @click="onSaveEntityDetail">保存</el-button></el-form-item>
                                 </el-form>
                             </el-tab-pane>
                             <el-tab-pane label="字段定义" name="entityFields">
-                                fields
+								<el-table :data="fieldsData">
+									<el-table-column prop="EID" label="所属实体ID"></el-table-column>
+									<el-table-column prop="ID" label="ID"></el-table-column>
+									<el-table-column prop="name" label="字段名"></el-table-column>
+									<el-table-column prop="label" label="显示名称"></el-table-column>
+									<el-table-column prop="type" label="类型"></el-table-column>
+									<el-table-column prop="constraints" label="约束"></el-table-column>
+								</el-table>
                             </el-tab-pane>
                         </el-tabs>
                     </el-col>
@@ -71,6 +78,8 @@ export default {
                     { required: true, message: '请输入显示名称', trigger: 'blur' }
                 ],
             },
+			// 当前选中实体的字段定义信息
+			fieldsData:[],
         };
     },
     methods:{
@@ -88,10 +97,21 @@ export default {
         },
         // 选中某个实体定义后显示详情
         handleEntityClick:function (data) {
+            console.log(data);
             this.entityDetailForm.ID = data['ID'];
             this.entityDetailForm.name = data['name'];
             this.entityDetailForm.label = data['label'];
-            console.log(data);
+			// 获取字段信息
+			var filedsUrl = this.baseUrl + '/' + data['ID'] + '/fields';
+			axios.get(filedsUrl)
+                .then(function (response) {
+                    console.log(response);
+                    this.fieldsData = response.data;
+                }.bind(this))
+                .catch(function (error) {
+                    alert(error);
+                    console.log(error);
+                });
         },
         addEntity:function () {
             this.entityDetailForm.ID = '';
@@ -127,7 +147,7 @@ export default {
                     }.bind(this));
             }
         },
-        showMenu:function (parameter) {
+        showMenu_entiryTree:function (parameter) {
 			parameter.preventDefault()
 			var x = parameter.clientX
 			var y = parameter.clientY
