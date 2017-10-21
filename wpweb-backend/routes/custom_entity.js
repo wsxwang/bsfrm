@@ -3,6 +3,7 @@ var path = require('path');
 var router = express.Router();
 
 var api = require(path.join(__dirname, '../src/api/custom_entity'));
+var base = require(path.join(__dirname, '../src/cmp/base'));
 
 var handelInfo=function(info, err) {
 }
@@ -37,6 +38,7 @@ router.get('/:id', function (req, res, next) {
 router.post('/', function (req,res,next) {
     res.header('Content-Type', 'application/json;charset=utf-8');
     try {
+        fillGuid(req.body);
         api.insertEntitys(req.body);
         res.status(201).json({message:"add success"});
     }catch (e){
@@ -68,8 +70,7 @@ router.put('/', function (req,res,next) {
 
 // options
 router.options('/', function (req,res,next) {
-    res.header('Content-Type', 'application/json;charset=utf-8');
-    res.status(400).json({message:"not implemented"});
+    next();
 })
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -145,4 +146,15 @@ router.put('/fields/', function (req,res,next) {
         res.status(500).json(e);
     }
 })
+
+//////////////////////////////////////////////////////////////////////////////////
+// records:[{ID:'xxxx',...},{},...],
+var fillGuid=function (records) {
+    for(var i in records){
+        if((records[i]['ID'] == null) || (records[i]['ID'] == '')){
+            records[i]['ID'] = base.newGuid();
+        }
+    }
+};
+
 module.exports = router;
