@@ -18,8 +18,15 @@
 					<el-option v-for="item in vueNames" :key="item" :label="item" :value="item"></el-option>
 				</el-select>
 			    <div :style="chosenVue=='adminCustom'?'display:block':'display:none'"><adminCustom></adminCustom></div>
-                <div :style="chosenVue=='adminequ'?'display:block':'display:none'"><adminequ></adminequ></div>
+                <div :style="chosenVue=='adminequ'?'display:block':'display:none'">
+					<adminequ></adminequ>
+				</div>
 				<div :style="chosenVue=='adminusr'?'display:block':'display:none'"><adminusr></adminusr></div>
+			    <div :style="chosenVue=='customEntityInfo'?'display:block':'display:none'">
+					<el-input placeholder="entity item guid" v-model="entity_item_guid"></el-input>
+					<el-input placeholder="entity metadata name" v-model="entity_metadata_name"></el-input>
+					<customEntityInfo :item_guid="entity_item_guid" :item_metadata_name="entity_metadata_name"></customEntityInfo>
+				</div>
 				<div :style="chosenVue=='login'?'display:block':'display:none'"><login></login></div>
 				<div :style="chosenVue=='nav_panel'?'display:block':'display:none'"><nav_panel></nav_panel></div>
 				<div :style="chosenVue=='projectBaseInfo'?'display:block':'display:none'"><projectBaseInfo></projectBaseInfo></div>
@@ -38,6 +45,7 @@
     import adminCustom from "./adminCustom.vue"
 	import adminequ from "./adminequ.vue"
 	import adminusr from "./adminusr.vue"
+	import customEntityInfo from "./customEntityInfo.vue"
 	import login from "./login.vue"
 	import nav_panel from "./nav_panel.vue"
 	import projectBaseInfo from "./projectBaseInfo.vue"
@@ -59,6 +67,7 @@ export default {
 			    'adminCustom',
 				'adminequ',
 				'adminusr',
+				'customEntityInfo',
 				'login',
 				'nav_panel',
 				'projectBaseInfo',
@@ -66,6 +75,9 @@ export default {
 				'taskDetail',
 				'taskMgr',
 			],
+			
+			entity_item_guid:'',
+			entity_metadata_name:'',
         };
     },
     methods:{
@@ -133,6 +145,7 @@ export default {
         adminCustom,
 		adminequ,
 		adminusr,
+		customEntityInfo,
 		login,
 		nav_panel,
 		projectBaseInfo,
