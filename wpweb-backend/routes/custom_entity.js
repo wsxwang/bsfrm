@@ -8,7 +8,65 @@ var base = require(path.join(__dirname, '../src/cmp/base'));
 var handelInfo=function(info, err) {
 }
 
-/* webservice: custom entity and its fields. */
+/*
+webservice:
+定制实体和关系的访问路由
+*/
+
+// options
+router.options('/', function (req,res,next) {
+    next();
+})
+
+// 获取指定实体（根据name）的完整元数据（包含字段定义）
+router.get('/:name', function (req, res, next) {
+    res.header('Content-Type', 'application/json;charset=utf-8');
+    try {
+        res.json(api.completeEntityMetaData(req.params.name));
+		/*
+		res.json({
+			name:'test-entity',
+			label:'测试实体',
+			fields:[
+				{
+					eName:'test-entity',
+					name:'col1',
+					label:'字段1',
+					type:'string',
+					title:'测试字段1',
+				},
+				{
+					eName:'test-entity',
+					name:'col2',
+					label:'字段2',
+					type:'string',
+					title:'测试字段2',
+				},
+			],
+		});
+		*/
+    }catch (e){
+		console.error("[GET.%s]%o", req.params.name, e);
+        res.status(500).json(e);
+    }
+})
+/*
+// 获取指定实体（根据name）的所有字段
+router.get('/:name/fields/', function (req, res, next) {
+    res.header('Content-Type', 'application/json;charset=utf-8');
+    try {
+    //    res.json(api.fieldsByEID(req.params.name));
+		
+    }catch (e){
+        res.status(500).json(e);
+    }
+})
+
+
+
+
+
+
 
 // get all, return [{},{},...]
 router.get('/', function(req, res, next) {
@@ -68,10 +126,6 @@ router.put('/', function (req,res,next) {
     }
 })
 
-// options
-router.options('/', function (req,res,next) {
-    next();
-})
 
 //////////////////////////////////////////////////////////////////////////////////
 //fields
@@ -146,7 +200,7 @@ router.put('/fields/', function (req,res,next) {
         res.status(500).json(e);
     }
 })
-
+*/
 //////////////////////////////////////////////////////////////////////////////////
 // records:[{ID:'xxxx',...},{},...],
 var fillGuid=function (records) {

@@ -10,6 +10,7 @@ var fs = require('fs');
 // route to restful api
 var custom_entity = require('./routes/custom_entity');
 var custom_relation = require('./routes/custom_relation');
+var custom_entity_data = require('./routes/custom_entity_data');
 var users = require('./routes/users');
 // route to page
 var debug = require('./routes/debug');
@@ -68,6 +69,7 @@ app.use('/', function(req,res,next){
 
 app.use('/api/custom_entity', custom_entity);
 //app.use('/api/custom_relation', custom_relation);
+app.use('/api/custom_entity_data', custom_entity_data);
 app.use('/api/users', users);
 app.use('/debug', debug);
 app.use('/', home);

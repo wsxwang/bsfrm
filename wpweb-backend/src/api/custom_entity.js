@@ -1,4 +1,40 @@
 /*
+元数据文件：/public/db/meta_data.db
+
+自定义实体的元数据
+表名：TBL_meta_EntityDefine
+	name:实体名，唯一标识，用于健表
+    label:显示名称
+	title:备注
+
+自定义实体的字段元数据
+表名：TBL_meta_EntityFieldDefine
+    eName:实体name（关联项）
+	name:字段名，必填，与数据表对应
+    label:显示名称
+	title:备注
+
+完整的自定义实体元数据格式为：
+{
+	name:'unique notnull string as entity name',
+	label:'string notnull as entity label',
+	title:'string as entity remark',
+	fields:[
+		{
+			name:'string notnull as column name',
+			label:'string notnull as column shown label',
+			type:'string notnull as column type',
+			title:'string as column remark'
+		},
+		{},
+		...
+	],
+}
+
+
+
+
+
 自定义实体的api，涉及到两张元数据表：TBL_meta_EntityDefine，TBL_meta_EntityFieldDefine
 -----------------------------
 TBL_meta_EntityDefine:实体元数据定义
@@ -28,7 +64,7 @@ JSON格式：{
 	constraints:'xxx,xxx',
 }
 -----------------------------
-持久化：sqlite数据库文件：../../public/db/TBL_meta_data.db
+持久化：sqlite数据库文件：../../public/db/meta_data.db
 -----------------------------
 数据表命名：TBL_Entity_name
 -----------------------------
@@ -42,7 +78,64 @@ var path = require('path');
 var sqlite3=require('sqlite3');
 var dbOpr=require('../cmp/dbOpr_sqlite')
 
-const fileName_db = path.join(__dirname, '../../public/db/TBL_meta_data.db')
+const fileName_meta = path.join(__dirname, '../../public/db/meta_data.db')
+const fileName_data = path.join(__dirname, '../../public/db/custom_data.db')
+
+// 根据实体name字段获取该实体的完整元数据（包括字段定义）
+var completeEntityMetaData=function(name){
+	var sqlStr = "";
+	var ret = {};
+	
+	// 在数据文件中查找是否存在该实体的数据表
+	sqlStr = "SELECT tbl_name FROM SQLITE_MASTER WHERE tbl_name = 'TBL_DATA_" + name + "'";
+    var data_ret = dbOpr.exec_sync(fileName_data, sqlStr);
+	if ('error' in data_ret){throw data_ret;}
+	if (data_ret.length != 1) return null;	// 实体不存在
+
+	// 在元数据表中查找实体的定义
+	sqlStr = "SELECT name,label,title FROM TBL_meta_EntityDefine WHERE name='" + name + "'";
+    meta_ret = dbOpr.exec_sync(fileName_meta, sqlStr);
+	if ('error' in meta_ret){throw meta_ret;}
+	if (data_ret.length != 1) return null;	// 实体不存在
+
+	ret['name'] = name;
+	ret['label'] = meta_ret[0]['label'];
+	ret['title'] = meta_ret[0]['title'];
+
+	// 查找该表的所有字段
+	sqlStr = "PRAGMA TABLE_INFO('TBL_DATA_" + name + "')";
+    data_ret = dbOpr.exec_sync(fileName_data, sqlStr);
+	if ('error' in data_ret){throw data_ret;}
+	
+	// 在元数据表中查找字段的定义
+	sqlStr = "SELECT eName,name,label,title FROM TBL_meta_EntityFieldDefine WHERE eName='" + name + "'";
+    meta_ret = dbOpr.exec_sync(fileName_meta, sqlStr);
+	if ('error' in meta_ret){throw meta_ret;}
+
+	// 两个返回值join，以实际的数据表为基准
+	var fields=[];
+	for(var i in data_ret){
+		var field = {};
+		field['name'] = data_ret[i]['name'];
+		field['type'] = data_ret[i]['type'];
+		for(var j in meta_ret){
+			if(meta_ret[j]['name']==data_ret[i]['name']){
+				field['label'] = meta_ret[j]['label'];
+				field['title'] = meta_ret[j]['title'];
+			}
+		}
+		fields.push(field);
+	}
+	ret['fields'] = fields;
+	return ret;
+}
+
+
+
+
+
+
+
 
 // 从元数据库中读取所有实体定义（不包含字段），返回数组
 var allEntity=function () {
@@ -235,6 +328,10 @@ var checkFieldFmt=function (field) {
 }
 
 module.exports={
+	completeEntityMetaData,
+	
+	
+	
     allEntity,
     allFields,
     entityByID,
