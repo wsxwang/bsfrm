@@ -12,26 +12,24 @@
                         </el-col>
                     </div>
                     <el-col :span="18">
-                        <el-tabs activeName="entityDetail">
-                            <el-tab-pane label="实体信息" name="entityDetail">
-                                <el-form  label-width="100px" clas ="entityDetail" :model="entityDetailForm" :rules="entityDetailRules">
-                                    <el-form-item label="编号" label-width="100px" title="编号为空表示新增"><el-input :value="entityDetailForm.ID" :disabled="true"></el-input></el-form-item>
-                                    <el-form-item label="表名" label-width="100px" prop="name" title="不能重复！！！"><el-input v-model="entityDetailForm.name"></el-input></el-form-item>
-                                    <el-form-item label="显示" label-width="100px" prop="label"><el-input v-model="entityDetailForm.label"></el-input></el-form-item>
-                                    <el-form-item><el-button @click="onSaveEntityDetail">保存</el-button></el-form-item>
+						<el-button @click="onSaveEntityDetail" title="保存当前实体定义，若编号为空则新增此实体定义">保存</el-button>
+                        <el-collapse value="entityDetail">
+                            <el-collapse-item title="实体信息" name="entityDetail">
+                                <el-form  label-width="100px" :model="entityDetailForm" :rules="entityDetailRules">
+                                    <el-form-item label="表名" prop="name" title="不能重复！！！"><el-input v-model="entityDetailForm.name"></el-input></el-form-item>
+                                    <el-form-item label="显示" prop="label"><el-input v-model="entityDetailForm.label"></el-input></el-form-item>
+                                    <el-form-item label="备注" prop="title"><el-input v-model="entityDetailForm.title"></el-input></el-form-item>
                                 </el-form>
-                            </el-tab-pane>
-                            <el-tab-pane label="字段定义" name="entityFields">
+                            </el-collapse-item>
+                            <el-collapse-item title="字段定义" name="entityFields">
 								<el-table :data="fieldsData">
-									<el-table-column prop="EID" label="所属实体ID"></el-table-column>
-									<el-table-column prop="ID" label="ID"></el-table-column>
 									<el-table-column prop="name" label="字段名"></el-table-column>
 									<el-table-column prop="label" label="显示名称"></el-table-column>
 									<el-table-column prop="type" label="类型"></el-table-column>
-									<el-table-column prop="constraints" label="约束"></el-table-column>
+									<el-table-column prop="title" label="备注"></el-table-column>
 								</el-table>
-                            </el-tab-pane>
-                        </el-tabs>
+                            </el-collapse-item>
+                        </el-collapse>
                     </el-col>
                 </el-row>
             </el-tab-pane>
@@ -66,9 +64,9 @@ export default {
             },
             // 当前选中的实体定义信息
             entityDetailForm: {
-                ID: '',
                 name: '',
                 label: '',
+				title:'',
             },
             entityDetailRules:{
                 name: [
@@ -87,31 +85,21 @@ export default {
         refreshEntity:function () {
             axios.get(this.baseUrl)
                 .then(function (response) {
-                    console.log(response);
+                    console.log('[adminCustom.refreshEntity()]', response);
                     this.entityData = response.data;
                 }.bind(this))
                 .catch(function (error) {
                     alert(error);
-                    console.log(error);
+                    console.log('[adminCustom.refreshEntity()]', error);
                 });
         },
         // 选中某个实体定义后显示详情
         handleEntityClick:function (data) {
-            console.log(data);
-            this.entityDetailForm.ID = data['ID'];
+            console.log('[adminCustom.handleEntityClick()]',data);
             this.entityDetailForm.name = data['name'];
             this.entityDetailForm.label = data['label'];
-			// 获取字段信息
-			var filedsUrl = this.baseUrl + '/' + data['ID'] + '/fields';
-			axios.get(filedsUrl)
-                .then(function (response) {
-                    console.log(response);
-                    this.fieldsData = response.data;
-                }.bind(this))
-                .catch(function (error) {
-                    alert(error);
-                    console.log(error);
-                });
+            this.entityDetailForm.title = data['title'];
+			this.fieldsData = data['fields'];
         },
         addEntity:function () {
             this.entityDetailForm.ID = '';
@@ -123,29 +111,27 @@ export default {
             alert("删除需谨慎，尚未实现，需要：1、删除数据；2、删除字段定义；3、删除实体定义")
         },
         onSaveEntityDetail:function () {
-            var item = {ID:this.entityDetailForm.ID, name:this.entityDetailForm.name, label:this.entityDetailForm.label};
-            if(this.entityDetailForm.ID == ''){
-                //add
-                axios.post(this.baseUrl, [item])
-                    .then(function (response) {
-                        console.log(response);
-                        this.refreshEntity();
-                    }.bind(this))
-                    .catch(function (error) {
-                        alert(error);
-                        console.log(error);
-                    }.bind(this));
-            }else {
-                axios.put(this.baseUrl, [item])
-                    .then(function (response) {
-                        console.log(response);
-                        this.refreshEntity();
-                    }.bind(this))
-                    .catch(function (error) {
-                        alert(error);
-                        console.log(error);
-                    }.bind(this));
-            }
+			if((this.entityDetailForm.name == '')|| (this.entityDetailForm.label == '') || (this.fieldsData.length == 0)){
+				alert("参数不完备！");
+				return;
+			}
+            var item = {
+				name:this.entityDetailForm.name,
+				label:this.entityDetailForm.label,
+				title:this.entityDetailForm.title,
+				fields:this.fieldsData,
+			};
+			console.log('[adminCustom.onSaveEntityDetail()]', item);
+			
+			axios.put(this.baseUrl, [item])
+				.then(function (response) {
+					console.log('[adminCustom.onSaveEntityDetail()]', response);
+					this.refreshEntity();
+				}.bind(this))
+				.catch(function (error) {
+					alert(error);
+					console.log('[adminCustom.onSaveEntityDetail()]', error);
+				}.bind(this));
         },
         showMenu_entiryTree:function (parameter) {
 			parameter.preventDefault()

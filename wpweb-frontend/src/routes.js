@@ -1,6 +1,4 @@
 import content from "./views/content.vue"
-import projectMgr from "./views/projectMgr.vue"
-import taskMgr from "./views/taskMgr.vue"
 import adminusr from "./views/adminusr.vue"
 import adminequ from "./views/adminequ.vue"
 import adminCustom from "./views/adminCustom.vue"
@@ -26,20 +24,6 @@ const routes=[
 		icon: 'el-icon-menu',
         auth:true,
 		children:[
-            {
-                path:'/content/projectMgr',
-                component:projectMgr,
-                name:'项目管理',
-                icon: 'el-icon-document',
-                auth:true,
-            },
-            {
-                path:'/content/taskMgr',
-                component:taskMgr,
-                name:'任务管理',
-                icon: 'el-icon-document',
-                auth:true,
-            },
 		]
 	},
 	{

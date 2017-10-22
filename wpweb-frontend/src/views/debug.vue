@@ -29,10 +29,6 @@
 				</div>
 				<div :style="chosenVue=='login'?'display:block':'display:none'"><login></login></div>
 				<div :style="chosenVue=='nav_panel'?'display:block':'display:none'"><nav_panel></nav_panel></div>
-				<div :style="chosenVue=='projectBaseInfo'?'display:block':'display:none'"><projectBaseInfo></projectBaseInfo></div>
-				<div :style="chosenVue=='projectMgr'?'display:block':'display:none'"><projectMgr></projectMgr></div>
-				<div :style="chosenVue=='taskDetail'?'display:block':'display:none'"><taskDetail></taskDetail></div>
-				<div :style="chosenVue=='taskMgr'?'display:block':'display:none'"><taskMgr></taskMgr></div>
 			</p>
         </div>
         <div id="autotest">
@@ -48,10 +44,6 @@
 	import customEntityInfo from "./customEntityInfo.vue"
 	import login from "./login.vue"
 	import nav_panel from "./nav_panel.vue"
-	import projectBaseInfo from "./projectBaseInfo.vue"
-	import projectMgr from "./projectMgr.vue"
-	import taskDetail from "./taskDetail.vue"
-	import taskMgr from "./taskMgr.vue"
 	
 	var vues
 
@@ -70,10 +62,6 @@ export default {
 				'customEntityInfo',
 				'login',
 				'nav_panel',
-				'projectBaseInfo',
-				'projectMgr',
-				'taskDetail',
-				'taskMgr',
 			],
 			
 			entity_item_guid:'',
@@ -148,10 +136,6 @@ export default {
 		customEntityInfo,
 		login,
 		nav_panel,
-		projectBaseInfo,
-		projectMgr,
-		taskDetail,
-		taskMgr,
 	},
 }
 </script>
