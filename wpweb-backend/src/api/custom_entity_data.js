@@ -1,7 +1,7 @@
 /*
 定制实体的数据访问api
 
-所有定制的实体，其数据都存储于sqlite数据文件/public/db/TBL_custom_data.db中，
+所有定制的实体，其数据都存储于sqlite数据文件/public/db/custom_data.db中，
 实体数据存于单表中，起名为：TBL_DATA_xxx，xxx为实体元数据中定义的名称（非显示名称）
 
 函数均为同步模式
@@ -14,7 +14,7 @@ var path = require('path');
 var sqlite3=require('sqlite3');
 var dbOpr=require('../cmp/dbOpr_sqlite')
 
-const fileName_db = path.join(__dirname, '../../public/db/TBL_custom_data.db')
+const fileName_db = path.join(__dirname, '../../public/db/custom_data.db')
 
 // 在表名为ename的表中返回所有数据，返回：[{},{},...]
 var allRecords=function(ename){

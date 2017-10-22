@@ -31,6 +31,8 @@
 	],
 }
 
+注意：定制实体的数据表中会加入默认字段：guid
+
 
 
 
@@ -81,6 +83,40 @@ var dbOpr=require('../cmp/dbOpr_sqlite')
 const fileName_meta = path.join(__dirname, '../../public/db/meta_data.db')
 const fileName_data = path.join(__dirname, '../../public/db/custom_data.db')
 
+// 返回所有实体定义（包含字段），返回数组
+var allCompleteEntityMetaData=function () {
+	var sqlStr = "";
+	var ret = [];
+	
+	var names = allEntityName();	
+	for(var i in names){
+		var metadata = completeEntityMetaData(names[i]);
+		if(metadata['name'] != null){
+			ret.push(metadata);
+		}
+	}
+
+	return ret;
+}
+
+// 返回所有实体名(name)，返回数组
+var allEntityName=function(){
+	var sqlStr = "";
+	var ret = [];
+	
+	// 在数据文件中查找实体的数据表
+	sqlStr = "SELECT tbl_name FROM SQLITE_MASTER WHERE tbl_name like 'TBL_DATA_%'";
+    var data_ret = dbOpr.exec_sync(fileName_data, sqlStr);
+	if ('error' in data_ret){throw data_ret;}
+	if (data_ret.length == 0) return ret;	// 实体不存在
+	
+	for(var i in data_ret){
+		ret.push(data_ret[i]['tbl_name'].substring(9));
+	}
+
+	return ret;
+}
+
 // 根据实体name字段获取该实体的完整元数据（包括字段定义）
 var completeEntityMetaData=function(name){
 	var sqlStr = "";
@@ -90,13 +126,13 @@ var completeEntityMetaData=function(name){
 	sqlStr = "SELECT tbl_name FROM SQLITE_MASTER WHERE tbl_name = 'TBL_DATA_" + name + "'";
     var data_ret = dbOpr.exec_sync(fileName_data, sqlStr);
 	if ('error' in data_ret){throw data_ret;}
-	if (data_ret.length != 1) return null;	// 实体不存在
+	if (data_ret.length != 1) return ret;	// 实体不存在
 
 	// 在元数据表中查找实体的定义
 	sqlStr = "SELECT name,label,title FROM TBL_meta_EntityDefine WHERE name='" + name + "'";
     meta_ret = dbOpr.exec_sync(fileName_meta, sqlStr);
 	if ('error' in meta_ret){throw meta_ret;}
-	if (data_ret.length != 1) return null;	// 实体不存在
+	if (meta_ret.length != 1) return ret;	// 实体元数据不存在
 
 	ret['name'] = name;
 	ret['label'] = meta_ret[0]['label'];
@@ -115,6 +151,7 @@ var completeEntityMetaData=function(name){
 	// 两个返回值join，以实际的数据表为基准
 	var fields=[];
 	for(var i in data_ret){
+		if(data_ret[i]['name']=='guid'){continue;}
 		var field = {};
 		field['name'] = data_ret[i]['name'];
 		field['type'] = data_ret[i]['type'];
@@ -130,21 +167,60 @@ var completeEntityMetaData=function(name){
 	return ret;
 }
 
-
-
-
-
-
-
-
-// 从元数据库中读取所有实体定义（不包含字段），返回数组
-var allEntity=function () {
-	var ret = dbOpr.exec_sync(fileName_db, 'SELECT ID,name,label FROM TBL_meta_EntityDefine');
-	if('error' in ret){
-		throw ret;
+// 新建一个实体定义（包含字段），将创建实体元数据及数据表
+var newEntity=function (entity) {
+	var sqlStr = '';
+	var ret = null;
+	
+	if(checkEntityFmt(entity) == false){
+        throw Error('format error');
 	}
-	return ret;
+	
+	// 创建数据表
+	sqlStr="CREATE TABLE TBL_DATA_" + entity['name'] + "(guid varchar2(255)";
+	for(var i in entity['fields']){
+		var field = entity['fields'][i];
+		sqlStr += ','
+		sqlStr += field['name'];
+		sqlStr += " varchar2(255)";
+	}
+	sqlStr += ");";
+	ret = dbOpr.exec_sync(fileName_data, sqlStr);
+	if('error' in ret){
+        throw ret;
+    }
+
+	// 插入实体元数据定义
+	var insertEntitys=[{name:entity['name'],label:entity['label'],title:entity['title']}];
+	ret = dbOpr.insert_sync(fileName_meta, 'TBL_meta_EntityDefine', insertEntitys);
+    if('error' in ret){
+        throw ret;
+    }
+	
+	// 插入字段元数据定义
+	var insertFields=[];
+	for(var i in entity['fields']){
+		insertFields.push({
+			eName:entity['name'],
+			name:entity['fields'][i]['name'],
+			label:entity['fields'][i]['label'],
+			title:entity['fields'][i]['title'],
+		});
+	}
+	ret = dbOpr.insert_sync(fileName_meta, 'TBL_meta_EntityFieldDefine', insertFields);
+    if('error' in ret){
+        throw ret;
+    }
 }
+
+
+
+
+
+
+
+
+
 
 // 从元数据库中读取所有字段定义，返回数组
 var allFields=function () {
@@ -292,15 +368,17 @@ var checkEntityFmt=function (entity) {
     if (entity == null) {
         return false;
     }
-    if ((entity['ID'] == null) || entity['ID'] == '') {
-        return false;
-    }
     if ((entity['name'] == null) || entity['name'] == '') {
         return false;
     }
     if ((entity['label'] == null) || entity['label'] == '') {
         return false;
     }
+	for(var i in entity['fields']){
+		if (checkFieldFmt(entity['fields'][i]) == false){
+			return false;
+		}
+	}
     return true;
 }
 
@@ -312,13 +390,10 @@ var checkFieldFmt=function (field) {
     if (field == null) {
         return false;
     }
-    if ((field['EID'] == null) || field['EID'] == '') {
-        return false;
-    }
-    if ((field['ID'] == null) || field['ID'] == '') {
-        return false;
-    }
     if ((field['name'] == null) || field['name'] == '') {
+        return false;
+    }
+    if ((field['label'] == null) || field['label'] == '') {
         return false;
     }
     if ((field['type'] == null) || field['type'] == '') {
@@ -328,21 +403,9 @@ var checkFieldFmt=function (field) {
 }
 
 module.exports={
+	allEntityName,
+	allCompleteEntityMetaData,
 	completeEntityMetaData,
-	
-	
-	
-    allEntity,
-    allFields,
-    entityByID,
-    fieldsByEID,
-    fieldByID,
-    insertEntitys,
-    insertFields,
-    updateEntitys,
-    updateFields,
-    delEntity,
-    delField,
-    delFieldsByEID,
+	newEntity,
 };
 

@@ -18,38 +18,42 @@ router.options('/', function (req,res,next) {
     next();
 })
 
+// 获取所有实体的完整元数据（包含字段定义）
+router.get('/',function(req, res, next) {
+    res.header('Content-Type', 'application/json;charset=utf-8');
+    try {
+        res.json(api.allCompleteEntityMetaData());
+    }catch (e){
+		console.error("[GET /]%o", e);
+        res.status(500).json(e);
+    }
+});
+
+// 获取所有实体定义的名称
+router.get('/name',function(req, res, next) {
+    res.header('Content-Type', 'application/json;charset=utf-8');
+    try {
+        res.json(api.allEntityName());
+    }catch (e){
+		console.error("[GET /]%o", e);
+        res.status(500).json(e);
+    }
+});
+
 // 获取指定实体（根据name）的完整元数据（包含字段定义）
 router.get('/:name', function (req, res, next) {
+	if(req.params.name == 'name'){
+		next();
+	}
     res.header('Content-Type', 'application/json;charset=utf-8');
     try {
         res.json(api.completeEntityMetaData(req.params.name));
-		/*
-		res.json({
-			name:'test-entity',
-			label:'测试实体',
-			fields:[
-				{
-					eName:'test-entity',
-					name:'col1',
-					label:'字段1',
-					type:'string',
-					title:'测试字段1',
-				},
-				{
-					eName:'test-entity',
-					name:'col2',
-					label:'字段2',
-					type:'string',
-					title:'测试字段2',
-				},
-			],
-		});
-		*/
     }catch (e){
 		console.error("[GET.%s]%o", req.params.name, e);
         res.status(500).json(e);
     }
-})
+});
+
 /*
 // 获取指定实体（根据name）的所有字段
 router.get('/:name/fields/', function (req, res, next) {
