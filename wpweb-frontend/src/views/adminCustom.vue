@@ -4,10 +4,10 @@
             <el-tab-pane key="custom_entity" label="实体定义" name="custom_entity">
                 <el-row>
                     <div @contextmenu="showMenu_entiryTree">
-                        <VueContextMenu :contextMenuData="entityTreeContextMenu" @refresh="refreshEntity" @add="addEntity" @del="delEntity">
+                        <VueContextMenu :contextMenuData="entityTreeContextMenu" @refresh="refreshEntity" @add="addEntity" @del="delEntity" @checkAll="checkAll" @reverseCheck="reverseCheck">
                         </VueContextMenu>
                         <el-col :span="6">
-                            <el-tree ref="entityTree" :data="entityData" :props="entityProps" node-key="ID" @node-click="handleEntityClick" show-checkbox default-expand-all highlight-current>
+                            <el-tree ref="entityTree" :data="entityData" :props="entityProps" node-key="name" @node-click="handleEntityClick" show-checkbox default-expand-all highlight-current>
                             </el-tree>
                         </el-col>
                     </div>
@@ -57,9 +57,11 @@ export default {
                     y:null,
                 },
                 menulists:[
-                    {fnHandler:'refresh',icoName:'el-icon-setting',btnName:'刷新'},
-                    {fnHandler:'add',icoName:'el-icon-more',btnName:'添加'},
+                    {fnHandler:'refresh',icoName:'el-icon-search',btnName:'刷新'},
+                    {fnHandler:'add',icoName:'el-icon-plus',btnName:'添加'},
                     {fnHandler:'del',icoName:'el-icon-delete',btnName:'删除选中'},
+                    {fnHandler:'checkAll',icoName:'el-icon-check',btnName:'全选'},
+                    {fnHandler:'reverseCheck',icoName:'el-icon-circle-check',btnName:'反选'},
                 ],
             },
             // 当前选中的实体定义信息
@@ -101,6 +103,25 @@ export default {
             this.entityDetailForm.title = data['title'];
 			this.fieldsData = data['fields'];
         },
+		checkAll:function(){
+			var keys = [];
+			for(var i in this.$refs.entityTree.children){
+				keys.push(this.$refs.entityTree.children[i]['name']);
+			}
+			this.$refs.entityTree.setCheckedKeys(keys);
+		},
+		reverseCheck:function(){
+			var keys = [];
+			var checkedKeys = this.$refs.entityTree.getCheckedKeys(keys);
+			for(var i in this.$refs.entityTree.children){
+				var k = this.$refs.entityTree.children[i]['name'];
+				if (checkedKeys.indexOf(k) != -1){
+					continue;
+				}
+				keys.push(k);
+			}
+			this.$refs.entityTree.setCheckedKeys(keys);
+		},
         addEntity:function () {
             this.entityDetailForm.ID = '';
             this.entityDetailForm.name = '';
