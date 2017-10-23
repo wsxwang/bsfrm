@@ -12,7 +12,7 @@
                 <el-input type="password" v-model="loginform.pwd" auto-complete="off"></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button @click="onCommit">登录</el-button>
+                <el-button @click="onCommit" type="primary" autofocus>登录</el-button>
                 <el-button @click="onCancel">取消</el-button>
             </el-form-item>
         </el-form>
@@ -43,7 +43,8 @@
         },
         methods:{
             onCommit:function () {
-                // 验证用户...
+                // 验证用户
+				console.log(this.loginform);
                 axios.get('/api/users')
                     .then(function (response) {
                         var found = false;

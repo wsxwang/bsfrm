@@ -6,7 +6,7 @@
 					{{item_metadata!=null?item_metadata.label:'未查找到元数据'+item_metadata_name}}
 					<el-form-item label="guid" title="GUID为唯一编号，空表示新增一条数据"><el-input :value="entityItemForm.guid" :disabled="true"></el-input></el-form-item>
 					<el-form-item v-for="item in (item_metadata!=null?item_metadata.fields:null)" :key="item['name']" :label="item['label']" :title="item['title']">
-						<el-input v-model="entityItemForm[item['name']]"></el-input>{{item['name']}}
+						<el-input v-model="entityItemForm[item['name']]"></el-input>
 					</el-form-item>
 					<el-form-item>
 						<el-button @click="refresh">刷新</el-button>
