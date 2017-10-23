@@ -127,16 +127,20 @@ var completeEntityMetaData=function(name){
     var data_ret = dbOpr.exec_sync(fileName_data, sqlStr);
 	if ('error' in data_ret){throw data_ret;}
 	if (data_ret.length != 1) return ret;	// 实体不存在
+	ret['name'] = name;
 
 	// 在元数据表中查找实体的定义
 	sqlStr = "SELECT name,label,title FROM TBL_meta_EntityDefine WHERE name='" + name + "'";
     meta_ret = dbOpr.exec_sync(fileName_meta, sqlStr);
 	if ('error' in meta_ret){throw meta_ret;}
-	if (meta_ret.length != 1) return ret;	// 实体元数据不存在
+	if (meta_ret.length == 0){
+		ret['label'] = name;
+	}
+	else{
+		ret['label'] = meta_ret[0]['label'];
+		ret['title'] = meta_ret[0]['title'];
+	}
 
-	ret['name'] = name;
-	ret['label'] = meta_ret[0]['label'];
-	ret['title'] = meta_ret[0]['title'];
 
 	// 查找该表的所有字段
 	sqlStr = "PRAGMA TABLE_INFO('TBL_DATA_" + name + "')";
@@ -160,6 +164,9 @@ var completeEntityMetaData=function(name){
 				field['label'] = meta_ret[j]['label'];
 				field['title'] = meta_ret[j]['title'];
 			}
+		}
+		if((field['label']=='')||(field['label']==null)){
+			field['label']=field['name'];
 		}
 		fields.push(field);
 	}
