@@ -24,7 +24,7 @@ var handleAxiosError=function(error, _this_){
 	console.log('[handleAxiosError()]%o', error.response);
 	var errMsg = _this_.$createElement('div', null , [
 		_this_.$createElement('p', null, String(error) + (error.response !=null?('-' + error.response.statusText):'')),
-		error.response!=null?_this_.$createElement('p', null, 'error message: '+ error.response.data):null,
+		error.response!=null?_this_.$createElement('p', null, 'message: '+ error.response.data):null,
 	]);
 	Message({
 		message:errMsg,

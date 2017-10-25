@@ -70,19 +70,15 @@ export default {
 
                 axios.put(this.baseUrl, user)
                     .then(function (response) {
-                        console.log(response);
                         this.refresh();
                     }.bind(this))
 					.catch(function(error){apiBase.handleAxiosError(error, this);}.bind(this));
         },
         refresh(){
-            console.log(this.users);
             var userNodes = [];
             this.users.splice(0, this.users.length);
-            console.log(this.users);
             axios.get(this.baseUrl)
                 .then(function (response) {
-                    console.log(response);
                     for(var i in response.data)
                     {
                         var userNode = new Object();
@@ -105,7 +101,6 @@ export default {
             this.userInfoForm.userPwd = newUser['pwd'];
             axios.post(this.baseUrl, newUser)
                 .then(function (response) {
-                    console.log(response);
                 }.bind(this))
 				.catch(function(error){apiBase.handleAxiosError(error, this);}.bind(this));
         },
@@ -115,10 +110,8 @@ export default {
                 if (keys[i] == '-1'){
                     continue;
                 }
-                console.log("delete " + keys[i]);
                 axios.delete(this.baseUrl+'/'+keys[i])
                     .then(function (response) {
-                        console.log(response);
                         this.refresh();
                     }.bind(this))
 				.catch(function(error){apiBase.handleAxiosError(error, this);}.bind(this));
