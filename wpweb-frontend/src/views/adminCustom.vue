@@ -60,6 +60,7 @@
 
 <script>
     import axios from 'axios'
+	import apiBase from '../api/apiBase.js'
 
 export default {
     data() {
@@ -111,10 +112,7 @@ export default {
                     console.log('[adminCustom.refreshEntity()]', response);
                     this.entityData = response.data;
                 }.bind(this))
-                .catch(function (error) {
-                    alert(error);
-                    console.log('[adminCustom.refreshEntity()]', error);
-                });
+				.catch(function(error){apiBase.handleAxiosError(error, this);}.bind(this));
         },
         // 选中某个实体定义后显示详情
         handleEntityClick:function (data) {
@@ -227,10 +225,7 @@ export default {
 								this.refreshEntity();
 								this.entityChanged = false;
 							}.bind(this))
-							.catch(function (error) {
-								alert(error);
-								console.log('[adminCustom.onSaveEntityDetail()]', error);
-							}.bind(this));
+							.catch(function(error){apiBase.handleAxiosError(error, this);}.bind(this));
 						this.entityChanged = false;
 					}
 				}.bind(this),
@@ -277,8 +272,7 @@ export default {
 				console.log(column['property'], value);
 				row[column['property']] = value;
 				this.entityChanged = true;
-			}).catch(() => {
-			});
+			}).catch(() => {});
 		},
     },
     mounted(){

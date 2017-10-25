@@ -73,11 +73,7 @@ export default {
                         console.log(response);
                         this.refresh();
                     }.bind(this))
-                    .catch(function (error) {
-                        this.resInfo = JSON.stringify(error);
-                        console.error(error);
-                    }.bind(this));
-
+					.catch(function(error){apiBase.handleAxiosError(error, this);}.bind(this));
         },
         refresh(){
             console.log(this.users);
@@ -96,10 +92,7 @@ export default {
                         this.users.push(JSON.parse(JSON.stringify(response.data[i])));
                     }
                 }.bind(this))
-                .catch(function (error) {
-                    alert(error);
-                    console.log(error);
-                });
+				.catch(function(error){apiBase.handleAxiosError(error, this);}.bind(this));
             this.treeData=[{id:'-1',label:'root',children:userNodes}];
         },
         addUser(){
@@ -114,10 +107,7 @@ export default {
                 .then(function (response) {
                     console.log(response);
                 }.bind(this))
-                .catch(function (error) {
-                    alert(error);
-                    console.log(error);
-                }.bind(this));
+				.catch(function(error){apiBase.handleAxiosError(error, this);}.bind(this));
         },
         delUser(){
             var keys = this.$refs.userTree.getCheckedKeys();
@@ -131,10 +121,7 @@ export default {
                         console.log(response);
                         this.refresh();
                     }.bind(this))
-                    .catch(function (error) {
-                        alert(error);
-                        console.log(error);
-                    }.bind(this));
+				.catch(function(error){apiBase.handleAxiosError(error, this);}.bind(this));
             }
         },
 

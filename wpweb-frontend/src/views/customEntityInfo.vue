@@ -23,6 +23,7 @@
 <script>
 //展示一个定制实体的一条数据信息（定制数据表中的一行数据及其关联信息）
     import axios from 'axios'
+	import apiBase from '../api/apiBase.js'
 
 export default {
     data() {
@@ -93,16 +94,9 @@ export default {
 								this.entityItemForm[i] = response.data[i];
 							}
 						}.bind(this))
-						.catch(function (error) {
-							alert(error);
-							console.log('[customEntityInfo.refresh()] GET %o, %o', this.baseUrl + '/' + this.item_guid, error);
-						}.bind(this));
-					
+						.catch(function(error){apiBase.handleAxiosError(error, this);}.bind(this));
                 }.bind(this))
-                .catch(function (error) {
-                    alert(error);
-                    console.log('[customEntityInfo.refresh()] GET %o, %o', this.metaDataEntityBaseUrl + '/' + this.item_metadata_name, error);
-                }.bind(this));
+				.catch(function(error){apiBase.handleAxiosError(error, this);}.bind(this));
 			
 			// 拉取数据信息
 		},

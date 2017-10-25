@@ -21,6 +21,9 @@
 
 <script>
     import axios from "axios"
+	import { Message } from 'element-ui';
+	import apiBase from "../api/apiBase.js"
+	
     export default{
         data() {
             return {
@@ -44,7 +47,6 @@
         methods:{
             onCommit:function () {
                 // 验证用户
-				console.log(this.loginform);
                 axios.get('/api/users')
                     .then(function (response) {
                         var found = false;
@@ -63,19 +65,16 @@
                                     this.$router.push({path: '/content'});
                                 }
                                 else{
-                                    alert("密码不正确");
+									this.$message({message:"密码不正确", type:"error"});
                                     break;
                                 }
                             }
                         }
                         if (!found) {
-                            alert("用户不存在");
+							this.$message({message:"用户不存在", type:"error"});
                         }
                     }.bind(this))
-                    .catch(function (error) {
-                        alert(error);
-                        console.log(error);
-                    });
+					.catch(function(error){apiBase.handleAxiosError(error, this);}.bind(this));
             },
             onCancel:function (){
                 console.log("cancel");
