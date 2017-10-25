@@ -220,7 +220,10 @@ var newEntity=function (entity) {
     }
 }
 
-
+// 更新一个实体定义
+var updateEntity=function (entitys) {
+	throw Error('not implemented!');
+}
 
 
 

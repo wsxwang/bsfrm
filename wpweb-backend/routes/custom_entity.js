@@ -54,6 +54,19 @@ router.get('/:name', function (req, res, next) {
     }
 });
 
+// 修改一批实体定义，若name字段不存在则新建，参数是[{name:xxx,...},{}...]
+router.put('/', function (req,res,next) {
+    res.header('Content-Type', 'application/json;charset=utf-8');
+    try {
+        api.updateEntity(req.body);
+        res.status(201).json({message:"modify success"});
+    }catch (e){
+		console.error("[PUT.%o]%o", req.body, e);
+		//res.json({error:e.message});
+        res.status(500).json(e.message);
+    }
+});
+
 /*
 // 获取指定实体（根据name）的所有字段
 router.get('/:name/fields/', function (req, res, next) {
