@@ -174,8 +174,27 @@ var completeEntityMetaData=function(name){
 	return ret;
 }
 
+// 更新一批实体定义，若
+var updateEntitys=function (entitys) {
+	if((entitys instanceof Array) == false) throw Error('format error');
+	if(entitys.length == 0) throw Error('format error');
+	
+	var names = allEntityName();
+	entitys.forEach(function(item, index, arr){
+		if(names.findIndex(function(v, i, a){if(v == item['name']) return i;}) == -1){
+			// 新增
+			newEntity(item);
+		}else{
+			// 更新
+			updateEntity(item);
+		}
+	});
+}
+
 // 新建一个实体定义（包含字段），将创建实体元数据及数据表
 var newEntity=function (entity) {
+	throw Error("newEntity not implemented");
+
 	var sqlStr = '';
 	var ret = null;
 	
@@ -220,154 +239,9 @@ var newEntity=function (entity) {
     }
 }
 
-// 更新一个实体定义
-var updateEntity=function (entitys) {
-	throw Error('not implemented!');
-}
-
-
-
-
-
-
-
-
-// 从元数据库中读取所有字段定义，返回数组
-var allFields=function () {
-    var ret = dbOpr.exec_sync(fileName_db, 'SELECT EID,ID,name,label,type,constraints FROM TBL_meta_EntityFieldDefine');
-    if('error' in ret){
-        throw ret;
-    }
-    return ret;
-}
-
-// 从元数据库中根据id查找实体定义，返回JSON对象，未找到则返回null
-var entityByID=function (id) {
-    var ret = dbOpr.exec_sync(fileName_db, "SELECT ID,name,label FROM TBL_meta_EntityDefine WHERE ID='" + id + "'");
-    if('error' in ret){
-        throw ret;
-    }
-    return ret[0];
-}
-
-// 从元数据库中根据实体ID查找对应的字段定义，返回数组
-var fieldsByEID=function (eid) {
-    var ret = dbOpr.exec_sync(fileName_db, "SELECT EID,ID,name,label,type,constraints FROM TBL_meta_EntityFieldDefine WHERE EID='" + eid + "'");
-    if('error' in ret){
-        throw ret;
-    }
-    return ret;
-}
-
-// 从元数据库中根据字段ID查找对应的字段定义
-var fieldByID=function (id) {
-    var ret = dbOpr.exec_sync(fileName_db, "SELECT EID,ID,name,label,type,constraints FROM TBL_meta_EntityFieldDefine WHERE ID='" + id + "'");
-    if('error' in ret){
-        throw ret;
-    }
-    return ret[0];
-}
-
-// 向元数据库中插入一批实体定义（不包含字段）
-var insertEntitys=function (entitys) {
-    for(var i in entitys){
-        if(checkEntityFmt(entitys[i]) == false){
-            throw new Error('format error');
-        }
-    }
-    var ret = dbOpr.insert_sync(fileName_db, 'TBL_meta_EntityDefine', entitys);
-    if('error' in ret){
-        throw ret;
-    }
-}
-
-// 向元数据库中插入一批字段定义
-var insertFields=function (fields) {
- 	for(var i in fields){
-        if(checkFieldFmt(fields[i]) == false){
-            throw new Error('format error');
-        }
-	}
-
-    var ret = dbOpr.insert_sync(fileName_db, 'TBL_meta_EntityFieldDefine', fields);
-    if('error' in ret){
-        throw ret;
-    }
-}
-
-// 在元数据库中更新一个实体定义
-var updateEntitys=function (entitys) {
-    for(var i in entitys){
-        if(checkEntityFmt(entitys[i]) == false){
-            throw new Error('entity format error');
-        }
-    }
-
-    var sqlArray = [];
-    for(var i in entitys) {
-        var sqlStr = "UPDATE TBL_meta_EntityDefine SET "
-            + " name='" + entitys[i]['name']
-            + "', label='" + entitys[i]['label']
-            + "' WHERE ID='" + entitys[i]['ID'] + "'";
-        sqlArray.push(sqlStr);
-    }
-
-    var ret = dbOpr.execBatch_sync(fileName_db, sqlArray);
-    if ('error' in ret) {
-        throw ret;
-    }
-}
-
-// 在元数据库中更新一批字段定义
-var updateFields=function (fields) {
-    for(var i in fields){
-        if(checkFieldFmt(fields[i]) == false){
-            throw new Error('field format error');
-        }
-    }
-
-    var sqlArray = [];
-    for(var i in fields) {
-        var sqlStr = "UPDATE TBL_meta_EntityFieldDefine SET "
-            + "EID='" + fields[i]['EID']
-            + "', name='" + fields[i]['name']
-            + "', label='" + fields[i]['label']
-            + "', type='" + fields[i]['type']
-            + "', constraints='" + fields[i]['constraints']
-            + "' WHERE ID='" + fields[i]['ID'] + "'";
-        sqlArray.push(sqlStr);
-    }
-    var ret = dbOpr.execBatch_sync(fileName_db, sqlArray);
-    if ('error' in ret) {
-        throw ret;
-    }
-}
-
-// 从元数据库中删除指定ID的实体定义
-var delEntity=function (id) {
-    var sqlStr = "DELETE FROM TBL_meta_EntityDefine WHERE ID = '" + id + "'";
-    var ret = dbOpr.exec_sync(fileName_db, sqlStr);
-    if (typeof (ret) != 'number') {
-        throw ret;
-    }
-}
-
-// 从元数据库中删除指定ID的字段定义
-var delField=function (id) {
-    var sqlStr = "DELETE FROM TBL_meta_EntityFieldDefine WHERE ID = '" + id + "'";
-    var ret = dbOpr.exec_sync(fileName_db, sqlStr);
-    if (typeof (ret) != 'number') {
-        throw ret;
-    }
-}
-
-// 从元数据库中删除指定EID（实体定义ID）的字段定义
-var delFieldsByEID=function (eid) {
-    var sqlStr = "DELETE FROM TBL_meta_EntityFieldDefine WHERE EID = '" + eid + "'";
-    var ret = dbOpr.exec_sync(fileName_db, sqlStr);
-    if (typeof (ret) != 'number') {
-        throw ret;
-    }
+// 新建一个实体定义（包含字段），将创建实体元数据及数据表
+var updateEntity=function (entity) {
+	throw Error("updateEntity not implemented");
 }
 
 /*
@@ -416,6 +290,6 @@ module.exports={
 	allEntityName,
 	allCompleteEntityMetaData,
 	completeEntityMetaData,
-	newEntity,
+	updateEntitys,
 };
 

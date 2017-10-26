@@ -25,7 +25,7 @@ router.get('/',function(req, res, next) {
         res.json(api.allCompleteEntityMetaData());
     }catch (e){
 		console.error("[GET /]%o", e);
-        res.status(500).json(e);
+        res.status(500).json(e['error']==null?e['message']:e['error'].toString());
     }
 });
 
@@ -36,7 +36,7 @@ router.get('/name',function(req, res, next) {
         res.json(api.allEntityName());
     }catch (e){
 		console.error("[GET /]%o", e);
-        res.status(500).json(e);
+        res.status(500).json(e['error']==null?e['message']:e['error'].toString());
     }
 });
 
@@ -50,7 +50,7 @@ router.get('/:name', function (req, res, next) {
         res.json(api.completeEntityMetaData(req.params.name));
     }catch (e){
 		console.error("[GET.%s]%o", req.params.name, e);
-        res.status(500).json(e);
+        res.status(500).json(e['error']==null?e['message']:e['error'].toString());
     }
 });
 
@@ -58,12 +58,11 @@ router.get('/:name', function (req, res, next) {
 router.put('/', function (req,res,next) {
     res.header('Content-Type', 'application/json;charset=utf-8');
     try {
-        api.updateEntity(req.body);
+        api.updateEntitys(req.body);
         res.status(201).json({message:"modify success"});
     }catch (e){
-		console.error("[PUT.%o]%o", req.body, e);
-		//res.json({error:e.message});
-        res.status(500).json(e.message);
+		console.log("[PUT.%o]%o", req.body, e);
+        res.status(500).json(e['error']==null?e['message']:e['error'].toString());
     }
 });
 
