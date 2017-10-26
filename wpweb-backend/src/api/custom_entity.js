@@ -174,7 +174,7 @@ var completeEntityMetaData=function(name){
 	return ret;
 }
 
-// 更新一批实体定义，若
+// 更新一批实体定义，参数是数组，对于其中每一个元素，将检查实体定义是否存在，若不存在则新建，否则只更新
 var updateEntitys=function (entitys) {
 	if((entitys instanceof Array) == false) throw Error('format error');
 	if(entitys.length == 0) throw Error('format error');
@@ -239,9 +239,21 @@ var newEntity=function (entity) {
     }
 }
 
-// 新建一个实体定义（包含字段），将创建实体元数据及数据表
+// 更新一个实体定义，实体定义本身仅需更新元数据信息，字段信息的变更需要更改数据表
 var updateEntity=function (entity) {
 	throw Error("updateEntity not implemented");
+	
+	// 修改元数据定义
+	
+	// 检查数据表是否存在
+	
+	// 逐个字段
+	// 修改字段信息的元数据定义
+	// 修改数据表的字段名
+	// 修改数据表的字段类型
+	// 增加字段
+	
+	// 删除字段
 }
 
 /*
