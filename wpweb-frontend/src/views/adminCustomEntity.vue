@@ -245,8 +245,14 @@ export default {
 						axios.put(this.baseUrl, [item])
 							.then(function (response) {
 								console.log('[adminCustom.onSaveEntityDetail()]', response);
-								this.refreshEntity();
 								Loading.service({fullscreen:true}).close();
+								this.refreshEntity();
+								this.$message({
+									message:'保存成功',
+									showClose:true,
+									type:'info',
+								});
+								
 							}.bind(this))
 							.catch(function(error){
 								apiBase.handleAxiosError(error, this);
