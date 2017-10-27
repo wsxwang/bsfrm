@@ -28,7 +28,7 @@
 						</el-form>
 					</el-collapse-item>
 					<el-collapse-item title="字段定义" name="entityFields">
-						<el-table :data="fieldsData" border style="width:100%" @cell-dblclick="handleFieldDblClick"   title="双击表格修改。字段名、显示名称  必填、不能重复！！！">
+						<el-table :data="fieldsData" border style="width:100%" @cell-dblclick="handleFieldDblClick"   title="双击表格修改。字段名、显示名称  必填、不能重复！！！已创建的字段不能删除或修改字段名、类型！！！">
 							<el-table-column prop="name" label="字段名"></el-table-column>
 							<el-table-column prop="label" label="显示名称"></el-table-column>
 							<el-table-column prop="type" label="类型">
@@ -42,7 +42,7 @@
 							</el-table-column>
 							<el-table-column prop="title" label="备注"></el-table-column>
 							<el-table-column prop="opr" label="操作" fixed="right" width="80"><template scope="scope">
-								<el-button @click.native.prevent="fieldsData.splice(scope.$index, 1)" type="text" size="small">移除</el-button>
+								<el-button @click.native.prevent="fieldsData.splice(scope.$index, 1)" type="text" size="small" title="对于已保存的字段，其字段名、类型不能修改，且不能删除">移除</el-button>
 							</template></el-table-column>
 						</el-table>
 					</el-collapse-item>
@@ -136,7 +136,10 @@ export default {
                     this.entityData = response.data;
 					Loading.service({fullscreen:true}).close();
                 }.bind(this))
-				.catch(function(error){apiBase.handleAxiosError(error, this);}.bind(this));
+				.catch(function(error){
+					apiBase.handleAxiosError(error, this);
+					Loading.service({fullscreen:true}).close();
+				}.bind(this));
         },
         // 选中某个实体定义后显示详情
         handleEntityClick:function (data) {
