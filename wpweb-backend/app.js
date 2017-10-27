@@ -1,11 +1,14 @@
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
-var logger = require('morgan');
+var morgan = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var FileStreamRotator = require('file-stream-rotator');
 var fs = require('fs');
+var log4js = require('log4js');
+
+var base = require('./src/cmp/base');
 
 // route to restful api
 var custom_entity = require('./routes/custom_entity');
@@ -15,10 +18,6 @@ var users = require('./routes/users');
 // route to page
 var debug = require('./routes/debug');
 var home = require('./routes/home');
-
-
-
-
 
 var login = require('./routes/login');
 var admin = require('./routes/admin');
@@ -39,9 +38,9 @@ app.set("view engine", "html");
 app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')));
 
 // 更改日志记录
-app.use(logger('dev'));
-// 按天分日志文件
+app.use(morgan('dev'));
 /*
+// 按天分日志文件，使用log4js之后，不再使用
 var logDirectory = path.join(__dirname, 'log');
 fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory);
 var accessLogStream = FileStreamRotator.getStream({
@@ -50,8 +49,9 @@ var accessLogStream = FileStreamRotator.getStream({
   frequency: 'daily',
   verbose: false
 });
-app.use(logger('short',{stream:accessLogStream}));
+app.use(morgan('short',{stream:accessLogStream}));
 */
+app.use(log4js.connectLogger(base.logger4js_access, { level: log4js.levels.INFO }));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -87,7 +87,7 @@ app.use(function(req, res, next) {
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function(err, req, res, next) {  
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
@@ -95,8 +95,9 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   
-  //... 错误处理未记录日志
-  console.error(err);
+  // 错误处理未记录日志
+  base.logger4js_access.error(err);
+  
   res.render('error');
 });
 

@@ -9,11 +9,14 @@ var sqlite3 = require('sqlite3');
 var sqliteSync = require('sqlite-sync');
 var assert = require('assert');
 
+var base = require('./base');
+
 /*
 从指定数据库中读取指定表的所有数据
 handle=function(err, allRecords){}
 */
 var queryAll=function(fileName, sqlStr, handle){
+	base.logger4js_db.trace('queryAll(%s,%s)',fileName, sqlStr);
 	assert(typeof(handle)=='function');
     assert((fileName != null) && (fileName != ''));
     assert((sqlStr != null) && (sqlStr != ''));
@@ -30,16 +33,17 @@ var queryAll=function(fileName, sqlStr, handle){
 在指定数据库中执行多个语句
 handle=function(err){}，执行后调用
 */
-var execBatch=function(fileName, sqlArr, handle){
+var execBatch=function(fileName, sqlArray, handle){
+	base.logger4js_db.trace('execBatch(%s,%o)',fileName, sqlArray);
 	assert(typeof(handle)=='function');
-    assert(sqlArr instanceof Array);
-    assert(sqlArr.length > 0);
+    assert(sqlArray instanceof Array);
+    assert(sqlArray.length > 0);
     assert((fileName != null) && (fileName != ''));
 	var db =new sqlite3.Database(fileName);
 	db.serialize(function() {
 		var sqlStr = "";
-		for(var i in sqlArr){
-			sqlStr += sqlArr[i] + ";";
+		for(var i in sqlArray){
+			sqlStr += sqlArray[i] + ";";
 		}
 		db.exec(sqlStr, function(err){
 			handle(err);
@@ -55,6 +59,7 @@ var execBatch=function(fileName, sqlArr, handle){
 返回值依赖于sql执行结果，若发生错误，返回一个错误对象
 */
 var exec_sync=function(fileName, sqlStr){
+	base.logger4js_db.trace('exec_sync(%s,%s)',fileName, sqlStr);
     assert((fileName != null) && (fileName != ''));
     assert((sqlStr != null) && (sqlStr != ''));
 
@@ -70,6 +75,7 @@ var exec_sync=function(fileName, sqlStr){
 语句一条一条执行，若失败则终止并返回错误信息，若成功则将返回值作为要给数组返回
 */
 var execBatch_sync=function(fileName, sqlArray){
+	base.logger4js_db.trace('execBatch_sync(%s,%o)',fileName, sqlArray);
     assert((fileName != null) && (fileName != ''));
     assert(sqlArray instanceof Array);
     assert(sqlArray.length > 0);
@@ -79,6 +85,7 @@ var execBatch_sync=function(fileName, sqlArray){
     for(var i in sqlArray){
         var rr = sqliteSync.run(sqlArray[i]);
         if((typeof(rr) == 'object') &&('error' in rr)){
+			sqliteSync.close();
             return rr;
         }else{
             ret.push(rr);
@@ -95,6 +102,7 @@ records：数组，元素是JSON对象，key与数据库字段一一对应
 数据是一条一条插入，若失败则终止并返回错误信息，若成功返回插入的行ID的数组
  */
 var insert_sync=function (fileName, tblName, records) {
+	base.logger4js_db.trace('insert_sync(%s,%s,%o)',fileName, tblName,records);
     assert((fileName != null) && (fileName != ''));
     assert((tblName != null) && (tblName != ''));
     assert(records instanceof Array);
@@ -106,6 +114,7 @@ var insert_sync=function (fileName, tblName, records) {
         if(typeof (index) == 'number') {
             ret.push(index);
         }else{
+			sqliteSync.close();
             return index;
         }
     }

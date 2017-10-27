@@ -12,6 +12,7 @@ src/api: api files, restful webservice style, mount on "/api/"
 src/cmp: components files,
 test: test files
 app.js: main
+config.json:config file, log config...
 
 useage:
     "npm start" fro web server start

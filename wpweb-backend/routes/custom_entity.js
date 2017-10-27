@@ -5,9 +5,6 @@ var router = express.Router();
 var api = require(path.join(__dirname, '../src/api/custom_entity'));
 var base = require(path.join(__dirname, '../src/cmp/base'));
 
-var handelInfo=function(info, err) {
-}
-
 /*
 webservice:
 定制实体和关系的访问路由
@@ -15,53 +12,65 @@ webservice:
 
 // options
 router.options('/', function (req,res,next) {
+	base.logger4js_api.trace("[OPTIONS %s%s]",req.baseUrl, req.path);
     next();
 })
 
 // 获取所有实体的完整元数据（包含字段定义）
 router.get('/',function(req, res, next) {
+	base.logger4js_api.trace("[GET %s%s]",req.baseUrl, req.path);
     res.header('Content-Type', 'application/json;charset=utf-8');
     try {
-        res.json(api.allCompleteEntityMetaData());
+		var ret = api.allCompleteEntityMetaData();
+		base.logger4js_api.info("[GET /api/custom_entity]%d", ret.length);
+        res.json(ret);
     }catch (e){
-		console.error("[GET /]%o", e);
+		base.logger4js_api.error("[GET /api/custom_entity]%o", e);
         res.status(500).json(e['error']==null?e['message']:e['error'].toString());
     }
 });
 
 // 获取所有实体定义的名称
 router.get('/name',function(req, res, next) {
+	base.logger4js_api.trace("[GET %s%s]",req.baseUrl, req.path);
     res.header('Content-Type', 'application/json;charset=utf-8');
     try {
-        res.json(api.allEntityName());
+		var ret = api.allEntityName();
+		base.logger4js_api.info("[GET /api/custom_entity/name]%d", ret.length);
+        res.json(ret);
     }catch (e){
-		console.error("[GET /]%o", e);
+		base.logger4js_api.error("[GET /api/custom_entity]%o", e);
         res.status(500).json(e['error']==null?e['message']:e['error'].toString());
     }
 });
 
 // 获取指定实体（根据name）的完整元数据（包含字段定义）
 router.get('/:name', function (req, res, next) {
+	base.logger4js_api.trace("[GET %s%s%s]",req.baseUrl, req.path, req.params.name);
 	if(req.params.name == 'name'){
 		next();
 	}
     res.header('Content-Type', 'application/json;charset=utf-8');
     try {
-        res.json(api.completeEntityMetaData(req.params.name));
+		var ret = api.completeEntityMetaData(req.params.name);
+		base.logger4js_api.info("[GET /api/custom_entity/%s] OK", req.params.name);
+        res.json(ret);
     }catch (e){
-		console.error("[GET.%s]%o", req.params.name, e);
+		base.logger4js_api.error("[GET /api/custom_entity/%s]%o", req.params.name, e);
         res.status(500).json(e['error']==null?e['message']:e['error'].toString());
     }
 });
 
 // 修改一批实体定义，若name字段不存在则新建，参数是[{name:xxx,...},{}...]
 router.put('/', function (req,res,next) {
+	base.logger4js_api.trace("[PUT %s%s] %d",req.baseUrl, req.path, req.body.length);
     res.header('Content-Type', 'application/json;charset=utf-8');
     try {
         api.updateEntitys(req.body);
+		base.logger4js_api.info("[PUT /api/custom_entity/] %d OK", req.body.length);
         res.status(201).json({message:"modify success"});
     }catch (e){
-		console.log("[PUT.%o]%o", req.body, e);
+		base.logger4js_api.error("[PUT /api/custom_entity/] %d fail: %o", req.body.length, e);
         res.status(500).json(e['error']==null?e['message']:e['error'].toString());
     }
 });
