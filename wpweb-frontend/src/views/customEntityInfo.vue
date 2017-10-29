@@ -106,7 +106,6 @@ export default {
         },
     },
     mounted(){
-	console.log("bbbbbb");
 		this.refresh();
     }
 }

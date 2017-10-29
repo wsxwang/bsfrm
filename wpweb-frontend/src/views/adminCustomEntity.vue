@@ -32,7 +32,7 @@
 							<el-table-column prop="name" label="字段名"></el-table-column>
 							<el-table-column prop="label" label="显示名称"></el-table-column>
 							<el-table-column prop="type" label="类型">
-								<template scope="scope">
+								<template slot-scope="scope">
 									<el-select v-model="scope.row.type" size="small">
 										<el-option v-for="item in [{value:'varchar2(255)',label:'字符串'},{value:'number',label:'数字'}]"
 										:key="item.value" :label="item.label" :value="item.value">
@@ -41,7 +41,7 @@
 								</template>
 							</el-table-column>
 							<el-table-column prop="title" label="备注"></el-table-column>
-							<el-table-column prop="opr" label="操作" fixed="right" width="80"><template scope="scope">
+							<el-table-column prop="opr" label="操作" fixed="right" width="80"><template slot-scope="scope">
 								<el-button @click.native.prevent="fieldsData.splice(scope.$index, 1)" type="text" size="small" title="对于已保存的字段，其字段名、类型不能修改，且不能删除">移除</el-button>
 							</template></el-table-column>
 						</el-table>
@@ -117,7 +117,7 @@ export default {
 				if(found['title'] != this.entityDetailForm['title']) return true;
 				if(found['fields'].length != this.fieldsData.length) return true;
 				/*
-				//...
+				//...字段是否发生了变化，未仔细实现
 				for(var i in this.fieldsData){
 					if(found['fields'][i] != this.fieldsData[i]) return true;
 				}
@@ -127,7 +127,6 @@ export default {
 		}
 	},
     methods:{
-//////// entity function ///////////////////////        
         refreshEntity:function () {
 			Loading.service({fullscreen:true});
             axios.get(this.baseUrl)
@@ -209,7 +208,33 @@ export default {
         },
         delEntity:function () {
             var keys = this.$refs.entityTree.getCheckedKeys();
-            alert("删除需谨慎，尚未实现，需要：1、删除数据；2、删除字段定义；3、删除实体定义")
+			console.log(keys);
+			this.$confirm('确定删除？', '提示', {
+				confirmButtonText: '确定',
+				cancelButtonText: '取消',
+				type: 'info',
+				callback:function(ret){
+					if(ret == 'confirm'){
+						Loading.service({fullscreen:true});
+						axios.delete(this.baseUrl+'/'+keys.toString())
+							.then(function (response) {
+								console.log('[adminCustom.delEntity()]', response);
+								Loading.service({fullscreen:true}).close();
+								this.refreshEntity();
+								this.$message({
+									message:'删除成功',
+									showClose:true,
+									type:'info',
+								});
+								
+							}.bind(this))
+							.catch(function(error){
+								apiBase.handleAxiosError(error, this);
+								Loading.service({fullscreen:true}).close();
+							}.bind(this));
+					}
+				}.bind(this),
+			});
         },
         onSaveEntityDetail:function () {
 			console.log('[adminCustom.onSaveEntityDetail()]', this.entityDetailForm, this.fieldsData);
