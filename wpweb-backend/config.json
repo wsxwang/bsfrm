@@ -52,7 +52,7 @@
 			},
 			"api":{
 				"appenders":["console", "everything", "api"],
-				"level":"info"
+				"level":"all"
 			}
 		}
 	}
