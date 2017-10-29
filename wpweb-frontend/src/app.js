@@ -10,6 +10,7 @@ import store from './store/index'
 import app from './views/app.vue'
 import routes from './routes'
 
+
 // axios配置
 axios.defaults.baseURL='http://localhost:3000/';
 
