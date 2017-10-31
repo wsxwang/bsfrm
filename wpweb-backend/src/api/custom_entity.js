@@ -182,8 +182,7 @@ var newEntity=function (entity) {
 		var field = entity['fields'][i];
 		sqlStr += ','
 		sqlStr += field['name'];
-		//...类型的变更未实现
-		sqlStr += " varchar2(255)";
+		sqlStr += ' ' + field['type'];
 	}
 	sqlStr += ");";
 	ret = dbOpr.exec_sync(fileName_data, sqlStr);
