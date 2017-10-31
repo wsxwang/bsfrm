@@ -182,6 +182,7 @@ var newEntity=function (entity) {
 		var field = entity['fields'][i];
 		sqlStr += ','
 		sqlStr += field['name'];
+		//...类型的变更未实现
 		sqlStr += " varchar2(255)";
 	}
 	sqlStr += ");";
@@ -351,9 +352,9 @@ var delEntity=function(name){
 	base.logger4js.trace("[delEntity(%s)]delete meta data success", name);
 }
 
+////////////////////////////////////////////////////////////
 /*
-判断实体定义格式是否合法
-不检测ID是否重复
+判断实体定义格式是否合法，不在数据库中检索
 */
 var checkEntityFmt=function (entity) {
     if (entity == null) {
@@ -365,8 +366,17 @@ var checkEntityFmt=function (entity) {
     if ((entity['label']== null) || entity['label']== '') {
         return false;
     }
+	if ((entity['fields'] instanceof Array) == false){
+		return false;
+	}
+    if (entity['fields'].length == 0) {
+        return false;
+    }
 	for(var i in entity['fields']){
 		if (checkFieldFmt(entity['fields'][i]) == false){
+			return false;
+		}
+		if((entity['fields'][i]['eName'] != entity['name']) && (entity['fields'][i]['eName'] != null) && (entity['fields'][i]['eName'] != '')){
 			return false;
 		}
 	}
@@ -374,8 +384,7 @@ var checkEntityFmt=function (entity) {
 }
 
 /*
-判断实体定义格式是否合法
-不检测ID是否重复，不检测EID是否存在
+判断实体的字段定义格式是否合法，不在数据库中检索
 */
 var checkFieldFmt=function (field) {
     if (field == null) {
@@ -387,18 +396,17 @@ var checkFieldFmt=function (field) {
     if ((field['label']== null) || field['label']== '') {
         return false;
     }
-    if ((field['type']== null) || field['type']== '') {
-        return false;
-    }
-    return true;
+	
+	return ['varchar2(255)', 'number'].findIndex(function(v){return v==field['type'];})!= -1;
 }
 
 module.exports={
+	checkEntityFmt,
+	checkFieldFmt,
 	allEntityName,
 	allCompleteEntityMetaData,
 	completeEntityMetaData,
 	updateEntitys,
 	delEntitys,
-	delEntity,
 };
 
