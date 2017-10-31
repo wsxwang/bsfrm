@@ -80,7 +80,7 @@ router.delete('/:names', function (req,res,next) {
 	base.logger4js_api.trace("[DEL %s%s(%s)]",req.baseUrl, req.path, req.params.names);
     res.header('Content-Type', 'application/json;charset=utf-8');
     try {
-		var ret = api.delEntity(req.params.names);
+		var ret = api.delEntitys(req.params.names);
 		base.logger4js_api.info("[DEL %s%s(%s)]OK",req.baseUrl, req.path, req.params.names);
         res.json(ret);
     }catch (e){
