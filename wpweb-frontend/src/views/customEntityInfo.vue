@@ -77,7 +77,7 @@ export default {
                 .then(function (response) {
                     console.log('[customEntityInfo.refresh()] GET %o, %o', this.metaDataEntityBaseUrl + '/' + this.item_metadata_name, response);
 					this.item_metadata = response.data;
-					
+
 					// 元数据绑定控件
 					for(var i in (this.item_metadata!=null?this.item_metadata.fields:null)){
 						if (this.entityItemForm[this.item_metadata.fields[i]['name']] == null){
