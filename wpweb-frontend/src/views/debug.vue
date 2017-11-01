@@ -22,10 +22,14 @@
 					<adminequ></adminequ>
 				</div>
 				<div :style="chosenVue=='adminusr'?'display:block':'display:none'"><adminusr></adminusr></div>
+				<div :style="chosenVue=='customEntityDataView'?'display:block':'display:none'">
+					<el-input placeholder="entity name" v-model="entity_name"></el-input>
+					<customEntityDataView :entity_name="entity_name"></customEntityDataView>
+				</div>
 			    <div :style="chosenVue=='customEntityInfo'?'display:block':'display:none'">
 					<el-input placeholder="entity item guid" v-model="entity_item_guid"></el-input>
-					<el-input placeholder="entity metadata name" v-model="entity_metadata_name"></el-input>
-					<customEntityInfo :item_guid="entity_item_guid" :item_metadata_name="entity_metadata_name"></customEntityInfo>
+					<el-input placeholder="entity name" v-model="entity_name"></el-input>
+					<customEntityInfo :item_guid="entity_item_guid" :entity_name="entity_name"></customEntityInfo>
 				</div>
 				<div :style="chosenVue=='login'?'display:block':'display:none'"><login></login></div>
 				<div :style="chosenVue=='nav_panel'?'display:block':'display:none'"><nav_panel></nav_panel></div>
@@ -41,6 +45,7 @@
     import adminCustom from "./adminCustom.vue"
 	import adminequ from "./adminequ.vue"
 	import adminusr from "./adminusr.vue"
+	import customEntityDataView from "./customEntityDataView.vue"
 	import customEntityInfo from "./customEntityInfo.vue"
 	import login from "./login.vue"
 	import nav_panel from "./nav_panel.vue"
@@ -59,13 +64,14 @@ export default {
 			    'adminCustom',
 				'adminequ',
 				'adminusr',
+				'customEntityDataView',
 				'customEntityInfo',
 				'login',
 				'nav_panel',
 			],
 			
 			entity_item_guid:'',
-			entity_metadata_name:'',
+			entity_name:'',
         };
     },
     methods:{
@@ -133,6 +139,7 @@ export default {
         adminCustom,
 		adminequ,
 		adminusr,
+		customEntityDataView,
 		customEntityInfo,
 		login,
 		nav_panel,
