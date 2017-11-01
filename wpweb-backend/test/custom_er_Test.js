@@ -21,6 +21,7 @@ describe('custom_er', function () {
 		it('checkEntityFmt()', function(done){
 			assert(api.checkEntityFmt({name:'n',label:'l',fields:[{eName:'n', name:'f',label:'l',type:'varchar2(255)'}]}) == true, "should true");
 			assert(api.checkEntityFmt({name:'n',label:'l',title:'t',fields:[{eName:'n', name:'f',label:'l',type:'varchar2(255)',title:'t'}]}) == true, "should true2");
+			assert(api.checkEntityFmt({name:'names',label:'l',title:'t',fields:[{eName:'names', name:'f',label:'l',type:'varchar2(255)',title:'t'}]}) == false, "can not use names as entity name!");
 			assert(api.checkEntityFmt() == false, "null, should false");
 			assert(api.checkEntityFmt({}) == false, "empty, should false");
 			assert(api.checkEntityFmt({label:'l',fields:[{eName:'n', name:'f',label:'l',type:'varchar2(255)'}]}) == false, "name null, should false");

@@ -12,71 +12,21 @@ webservice: 定制实体数据的访问
 
  // options
 router.options('/', function (req,res,next) {
+	base.logger4js_api.trace("[OPTIONS %s%s]",req.baseUrl, req.path);
     next();
 })
 
-// get all records, return {}
+// 获取指定实体的所有数据记录，返回数组
 router.get('/:ename', function (req, res, next) {
+	base.logger4js_api.trace("[GET %s%s(%s)]",req.baseUrl, req.path, req.params.ename);
     res.header('Content-Type', 'application/json;charset=utf-8');
     try {
         res.json(api.allRecords(req.params.ename));
     }catch (e){
-        res.status(500).json(e);
+		base.logger4js_api.error("[GET %s%s(%s)]%o",req.baseUrl, req.path, req.params.name, e);
+        res.status(500).json(e['error']==null?e['message']:e['error'].toString());
     }
 })
 
-// find record by guid, return {}
-router.get('/:ename/:guid', function (req, res, next) {
-    res.header('Content-Type', 'application/json;charset=utf-8');
-    try {
-        res.json(api.recordByGuid(req.params.ename, req.params.guid));
-    }catch (e){
-        res.status(500).json(e);
-    }
-})
-
-// add, parameter is [{},{}],ignore guid in parameter items
-router.post('/:ename/', function (req,res,next) {
-    res.header('Content-Type', 'application/json;charset=utf-8');
-    try {
-        fillGuid(req.body);
-        api.insertRecords(req.params.ename, req.body);
-        res.status(201).json({message:"add success"});
-    }catch (e){
-        res.status(500).json(e);
-    }
-})
-
-// delete records, parameter is [guid,guid,...]
-router.delete('/:ename/:guidArray', function (req,res,next) {
-    res.header('Content-Type', 'application/json;charset=utf-8');
-    try {
-        api.delRecords(req.params.ename, req.params.guidArray);
-        res.status(204).json({message:"delete success"});
-    }catch (e){
-        res.status(500).json(e);
-    }
-})
-
-// modify , parameter is [{guid:'...',...},{guid:'...',...},...]
-router.put('/:ename/', function (req,res,next) {
-    res.header('Content-Type', 'application/json;charset=utf-8');
-    try {
-        api.updateRecords(req.params.ename, req.body);
-        res.status(201).json({message:"modify success"});
-    }catch (e){
-        res.status(500).json(e);
-    }
-})
-
-//////////////////////////////////////////////////////////////////////////////////
-// records:[{guid:'xxxx',...},{},...],
-var fillGuid=function (records) {
-    for(var i in records){
-        if((records[i]['guid'] == null) || (records[i]['guid'] == '')){
-            records[i]['guid'] = base.newGuid();
-        }
-    }
-};
 
 module.exports = router;

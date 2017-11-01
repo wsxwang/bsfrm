@@ -1,9 +1,12 @@
 /*
 元数据文件：/public/db/meta_data.db
+数据文件：/public/db/custom_data.db
+
+实体对应于custom_data.db中的一张表，表名为TBL_DATA_xxx，xxx为实体名
 
 自定义实体的元数据
 表名：TBL_meta_EntityDefine
-	name:实体名，唯一标识，用于健表
+	name:实体名，唯一标识，用于建表
     label:显示名称
 	title:备注
 
@@ -13,6 +16,7 @@
 	name:字段名，必填，与数据表对应
     label:显示名称
 	title:备注
+注：类型直接来源于数据表，通过sqlite元数据获取
 
 完整的自定义实体元数据格式为：
 {
@@ -31,7 +35,9 @@
 	],
 }
 
-注意：定制实体的数据表中会加入默认字段：guid
+注意：
+	定制实体的数据表中会加入默认字段：guid
+	names为保留字，不得用于实体名称
 */
 
 var assert=require('assert');
@@ -74,7 +80,7 @@ var allEntityName=function(){
     var data_ret = dbOpr.exec_sync(fileName_data, sqlStr);
 	if ('error' in data_ret){throw data_ret;}
 	base.logger4js.trace("[allEntityName()]%d entity found", data_ret.length);
-	if (data_ret.length == 0) return ret;	// 实体不存在
+	if (data_ret.length==0) return ret;	// 实体不存在
 	
 	for(var i in data_ret){
 		ret.push(data_ret[i]['tbl_name'].substring(9));
@@ -102,7 +108,7 @@ var completeEntityMetaData=function(name){
 	sqlStr = "SELECT name,label,title FROM TBL_meta_EntityDefine WHERE name='" + name + "'";
     meta_ret = dbOpr.exec_sync(fileName_meta, sqlStr);
 	if ('error' in meta_ret){throw meta_ret;}
-	if (meta_ret.length == 0){
+	if (meta_ret.length==0){
 		ret['label']= name;
 	}
 	else{
@@ -149,14 +155,14 @@ var completeEntityMetaData=function(name){
 // 更新一批实体定义，参数是数组，对于其中每一个元素，将检查实体定义是否存在，若不存在则新建，否则只更新
 var updateEntitys=function (entitys) {
 	base.logger4js.trace("[updateEntitys(%d)]",entitys.length);
-	if((entitys instanceof Array) == false) throw Error('format error');
-	if(entitys.length == 0) throw Error('format error');
+	if((entitys instanceof Array)==false) throw Error('format error');
+	if(entitys.length==0) throw Error('format error');
 	
 	var names = allEntityName();
 	base.logger4js.trace("[updateEntitys(%d)]entity names in db: ",entitys.length, names);
 	entitys.forEach(function(item, index, arr){
 		base.logger4js.trace("[updateEntitys(%d)]insert or update entity %s",entitys.length, item['name']);
-		if(names.findIndex(function(v, i, a){if(v == item['name']){return true;}}) == -1){
+		if(names.findIndex(function(v, i, a){if(v==item['name']){return true;}})==-1){
 			// 新增
 			newEntity(item);
 		}else{
@@ -172,7 +178,7 @@ var newEntity=function (entity) {
 	var sqlStr = '';
 	var ret = null;
 	
-	if(checkEntityFmt(entity) == false){
+	if(checkEntityFmt(entity)==false){
         throw Error('format error');
 	}
 	
@@ -223,7 +229,7 @@ var updateEntity=function(entity) {
 	var sqlStr = '';
 	var ret = null;
 
-	if(checkEntityFmt(entity) == false){
+	if(checkEntityFmt(entity)==false){
         throw Error('format error');
 	}
 	
@@ -270,8 +276,8 @@ var updateEntity=function(entity) {
 
 		// 逐个字段
 		for(var i in entity['fields']){
-			var oldIndex = oldEntity['fields'].findIndex(function(v){return entity['fields'][i]['name']== v['name'];});
-			if(oldIndex == -1){
+			var oldIndex = oldEntity['fields'].findIndex(function(v){return entity['fields'][i]['name']==v['name'];});
+			if(oldIndex==-1){
 				// 该字段在旧定义中不存在
 				// 增加字段
 				sqlStr="ALTER TABLE TBL_DATA_" + entity['name']+ ' ADD ' + entity['fields'][i]['name']+ ' ' + entity['fields'][i]['type'];
@@ -298,7 +304,7 @@ var updateEntity=function(entity) {
 			}
 		}
 		for(var i in oldEntity['fields']){
-			if(entity['fields'].findIndex(function(v){return oldEntity['fields'][i]['name']== v['name'];}) == -1){
+			if(entity['fields'].findIndex(function(v){return oldEntity['fields'][i]['name']==v['name'];})==-1){
 				// 删除字段
 				// 删除数据表的字段，暂不支持！！！
 				throw Error("filed(data table column) delete not supported");
@@ -356,23 +362,23 @@ var delEntity=function(name){
 判断实体定义格式是否合法，不在数据库中检索
 */
 var checkEntityFmt=function (entity) {
-    if (entity == null) {
+    if (entity==null) {
         return false;
     }
-    if ((entity['name']== null) || entity['name']== '') {
+    if ((entity['name']==null) || (entity['name']=='') || (entity['name']=='names')) {
         return false;
     }
-    if ((entity['label']== null) || entity['label']== '') {
+    if ((entity['label']==null) || entity['label']=='') {
         return false;
     }
-	if ((entity['fields'] instanceof Array) == false){
+	if ((entity['fields'] instanceof Array)==false){
 		return false;
 	}
-    if (entity['fields'].length == 0) {
+    if (entity['fields'].length==0) {
         return false;
     }
 	for(var i in entity['fields']){
-		if (checkFieldFmt(entity['fields'][i]) == false){
+		if (checkFieldFmt(entity['fields'][i])==false){
 			return false;
 		}
 		if((entity['fields'][i]['eName'] != entity['name']) && (entity['fields'][i]['eName'] != null) && (entity['fields'][i]['eName'] != '')){
@@ -386,13 +392,13 @@ var checkEntityFmt=function (entity) {
 判断实体的字段定义格式是否合法，不在数据库中检索
 */
 var checkFieldFmt=function (field) {
-    if (field == null) {
+    if (field==null) {
         return false;
     }
-    if ((field['name']== null) || field['name']== '') {
+    if ((field['name']==null) || field['name']=='') {
         return false;
     }
-    if ((field['label']== null) || field['label']== '') {
+    if ((field['label']==null) || field['label']=='') {
         return false;
     }
 	

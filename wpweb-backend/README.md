@@ -20,30 +20,21 @@ useage:
 
 component custom_er:custom entity-relation model
     /src/api/custom_entity.js: custom entity api
+    /routes/custom_entity.js: route restful api "http://xxx/api/custom_entity", "http://xxx/api/custom_entity/:entityName", "http://xxx/api/custom_entity/names"
+	entity meta-data: described in /src/api/custom_entity.js
+
+	/src/api/custom_entity_data.js: custom entity data access api
+    /routes/custom_entity_data.js: route restful api "http://xxx/api/custom_data/:entity-name/"
+	
     /src/api/custom_relation.js: custom entity api
-    /routes/custom_entity.js: route restful api "http://xxx/api/custom_entity", "http://xxx/api/custom_entity/:entityID/fields", "http://xxx/api/custom_entity/fields"
     /routes/custom_relation.js: route restful api "http://xxx/api/custom_relation"
-    /routes/custom_data.js: route restful api "http://xxx/api/custom_data/:entity-name/"
+	
     /test/custom_er_Test.js: test script
-	entity meta-data:{
-		name:'unique notnull string as entity name',
-		label:'string notnull as entity label',
-		title:'string as entity remark',
-		fields:[
-			{
-				name:'string notnull as column name',
-				label:'string notnull as column shown label',
-				type:'string notnull as column type',
-				title:'string as column remark'
-			},
-			{},
-			...
-		],
-	}
 
 
 
 webserice api:
 http://xxx/api/users
 http://xxx/api/custom_entity
+http://xxx/api/custom_data
 http://xxx/api/custom_relation
