@@ -27,13 +27,14 @@ module.exports = {
                 test: /\.css$/,
                 loader: 'style-loader!css-loader'
             },
-            {
-                test: /\.(eot|svg|ttf|woff|woff2)(\?\S*)?$/,
-                loader: 'file-loader',
-                query: {
-                    name: '/ttfs/[name].[ext]?[hash]'
-                }
-            },
+			{
+				test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
+				loader: 'url-loader',
+				options: {
+				  limit: 10000,
+				  name: '/ttfs/[name].[ext]?[hash]'
+				}
+			},
             {
                 test: /\.(png|jpe?g|gif|svg)(\?\S*)?$/,
                 loader: 'file-loader',

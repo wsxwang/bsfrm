@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import elementui from 'element-ui'
-import 'element-ui/lib/theme-default/index.css'
+import 'element-ui/lib/theme-chalk/index.css'
 import axios from "axios"
 import debug from './views/debug.vue'
 

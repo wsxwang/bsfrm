@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import VueRouter from 'vue-router'
 import elementui from 'element-ui'
-import 'element-ui/lib/theme-default/index.css'
+import 'element-ui/lib/theme-chalk/index.css'
 import axios from "axios"
 import VueContextMenu from 'vue-contextmenu'
 import 'vue-contextmenu/style/css/font-awesome.min.css'

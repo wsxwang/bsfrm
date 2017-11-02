@@ -1,15 +1,34 @@
 <template>
     <div>
-		<el-button icon="plus" type="text" size="small" @click="records.push({guid:''})">添加</el-button>
-		<el-button icon="delete" type="text" size="small" @click="alert('delete')">删除选中</el-button>
-		<el-button icon="refresh" type="text" size="small" @click="refresh">刷新</el-button>
-		<el-table :data="records" border style="width:100%" @cell-dblclick="handleFieldDblClick"   title="双击表格修改。">
+		<el-button icon="el-icon-plus" type="text" size="small" @click="addRecord" title="新增一行记录">添加</el-button>
+		<el-button icon="el-icon-refresh" type="text" size="small" @click="refresh">刷新</el-button>
+		<el-table
+			ref="tblCustomEntityDataView"
+			highlight-current-row border
+			:data="records"
+			style="width:100%"
+			@cell-dblclick="handleFieldDblClick"
+			title="双击查看或修改记录"
+		>
 			<el-table-column prop="guid" label="ID"></el-table-column>
-			<el-table-column v-for="f in entity_metadata['fields']" :key="f.name" :prop="f.name" :label="f.label"></el-table-column>
-			<el-table-column prop="opr" label="操作" fixed="right" width="80"><template slot-scope="scope">
-				<el-button @click.native.prevent="records.splice(scope.$index, 1)" type="text" size="small" title="remove one record">移除</el-button>
+			<el-table-column v-for="f in entity_metadata['fields']" :key="f.name" :prop="f.name" :label="f.label" show-overflow-tooltip></el-table-column>
+			<el-table-column prop="opr" label="操作" fixed="right" width="60"><template slot-scope="scope">
+				<el-button @click.native.prevent="records.splice(scope.$index, 1)" type="text" size="small">移除</el-button>
 			</template></el-table-column>
 		</el-table>
+		<!--分页暂不实现
+		<el-pagination
+			:current-page.sync="currentPage"
+			:page-sizes="[10,20,50,100]"
+			:page-size="10"
+			layout="sizes,prev, pager, next, jumper"
+			@size-change="handleSizeChange"
+			@current-change="handleCurrentChange"
+		></el-pagination>
+		-->
+		<el-dialog title="xxx" :visible.sync="recordDialogVisible">
+			<customEntityInfo :item_guid="currentRecordGuid" :entity_name="entity_name"></customEntityInfo>
+		</el-dialog>
     </div>
 </template>
 
@@ -17,14 +36,18 @@
 // 查看指定实体的数据视图
     import axios from 'axios'
 	import apiBase from '../api/apiBase.js'
+	import customEntityInfo from "./customEntityInfo.vue"
 
 export default {
     data() {
         return {
             baseUrl:'/api/custom_entity_data',
 			metaDataEntityBaseUrl:'/api/custom_entity',
-			records:[],
-			entity_metadata:{},
+			records:[],					// 当前需要显示在表格中的数据集合
+			currentRecordGuid:'',		// 当前选中记录的guid
+			entity_metadata:{},			// 实体元数据信息
+			currentPage:1,				// 当前页码
+			recordDialogVisible:false,	// 是否显示一条记录的详情
         };
     },
 	props:{
@@ -44,10 +67,10 @@ export default {
 		// 从后端拉取数据
 		refresh:function(){
 			console.log('[customEntityDataView.refresh()]%o', this.item_guid, this.entity_name);
+			this.currentRecordGuid = '';
 			if((this.entity_name == '') || (this.entity_name == null)){
 				return;
 			}
-						
 			// 拉取元数据定义
 			axios.get(this.metaDataEntityBaseUrl + '/' + this.entity_name)
                 .then(function (response) {
@@ -64,18 +87,36 @@ export default {
                 }.bind(this))
 				.catch(function(error){apiBase.handleAxiosError(error, this);}.bind(this));
 		},
-		// 更新或新增数据
-        onSaveInfo:function () {
-			console.log('[customEntityInfo.onSaveInfo()] %o',this.entityItemForm);
-        },
+		// 添加记录
+		addRecord:function(){
+			this.popoutRecord('', true);
+		},
 		// 字段列表双击某格
 		handleFieldDblClick:function(row, column, cell, e){
-			alert("double click");
+			this.popoutRecord(row['guid'], true);
 		},
+		// 改变每页大小
+		handleSizeChange(val) {
+			console.log('每页%d条',val);
+		},
+		// 改变页
+		handleCurrentChange(val) {
+			console.log('当前页%d',val);
+		},
+		// 编辑或查看某记录
+		popoutRecord(guid, editable){
+			console.log(guid);
+			this.currentRecordGuid = guid;
+			this.recordDialogVisible = true;
+		},
+		
     },
     mounted(){
 		this.refresh();
-    }
+    },
+	components:{
+		customEntityInfo
+	}
 }
 </script>
 

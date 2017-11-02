@@ -40,6 +40,12 @@ export default {
         };
     },
 	props:{
+		// 元数据，null或''则不做任何事，若为字符串则表示实体名称，需要从服务端拉取元数据定义
+		entity_meta
+		// 一个实体记录，null或''表示需要新建，若为字符串表示记录的guid，需要从服务端拉取数据
+		item:null,
+	
+	
 		// 一个实体项目的guid
 		item_guid:'',
 		// 元数据定义的名称
@@ -65,13 +71,10 @@ export default {
 		// 从后端拉取数据
 		refresh:function(){
 			console.log('[customEntityInfo.refresh()] %o, %o', this.item_guid, this.entity_name);
-			if((this.item_guid == '') || (this.item_guid == null)){
-				return;
-			}
+
 			if((this.entity_name == '') || (this.entity_name == null)){
 				return;
 			}
-						
 			// 拉取元数据定义
 			axios.get(this.metaDataEntityBaseUrl + '/' + this.entity_name)
                 .then(function (response) {
@@ -84,6 +87,11 @@ export default {
 							this.entityItemForm[this.entity_metadata.fields[i]['name']] = '';
 						}
 					}
+					
+					if((this.item_guid == '') || (this.item_guid == null)){
+						return;
+					}
+					this.entityItemForm.guid = this.item_guid;
 
 					// 查询数据
 					axios.get(this.baseUrl + '/' + this.entity_metadata['name'] + "/" + this.item_guid)
@@ -97,8 +105,6 @@ export default {
 						.catch(function(error){apiBase.handleAxiosError(error, this);}.bind(this));
                 }.bind(this))
 				.catch(function(error){apiBase.handleAxiosError(error, this);}.bind(this));
-			
-			// 拉取数据信息
 		},
 		// 更新或新增数据
         onSaveInfo:function () {
