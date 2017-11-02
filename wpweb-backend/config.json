@@ -40,11 +40,11 @@
 			},
 			"everything":{
 				"appenders":["console", "everything"],
-				"level":"all"
+				"level":"info"
 			},
 			"db":{
 				"appenders":["console", "everything", "db"],
-				"level":"all"
+				"level":"info"
 			},
 			"access":{
 				"appenders":["everything", "access"],
@@ -52,7 +52,7 @@
 			},
 			"api":{
 				"appenders":["console", "everything", "api"],
-				"level":"all"
+				"level":"info"
 			}
 		}
 	}

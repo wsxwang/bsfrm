@@ -11,7 +11,7 @@ var assert=require('assert');
 var fs=require("fs");
 var path = require('path');
 var sqlite3=require('sqlite3');
-var dbOpr=require('../cmp/dbOpr_sqlite')
+var dbOpr=require('../cmp/dbOpr_sqlite');
 
 const fileName_db = path.join(__dirname, '../../public/db/custom_data.db')
 
