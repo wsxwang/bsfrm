@@ -1,18 +1,14 @@
 <template>
     <div>
+		<div style="margin-bottom: 20px;">
+			<el-button plain icon="el-icon-upload" size="mini" @click="onSaveInfo">保存</el-button>
+		</div>
         <el-tabs activeName="tab1" type="card">
             <el-tab-pane label="信息" name="tab1">
-				<el-form label-width="100px" :model="entityItemForm" :rules="entityItemRules">
-					{{entity_metadata!=null?entity_metadata.label:'未查找到元数据'+entity_name}}
-					<el-form-item label="guid" title="GUID为唯一编号，空表示新增一条数据"><el-input :value="entityItemForm.guid" :disabled="true"></el-input></el-form-item>
-					<el-form-item v-for="item in (entity_metadata!=null?entity_metadata.fields:null)" :key="item['name']" :label="item['label']" :title="item['title']">
-						<el-input v-model="entityItemForm[item['name']]"></el-input>
-					</el-form-item>
-					<el-form-item>
-						<el-button @click="refresh">刷新</el-button>
-						<el-button @click="onSaveInfo">保存</el-button>
-					</el-form-item>
-				</el-form>
+				<el-table :data="data" style="width:100%" border stripe :show-header="false" title="双击修改" @row-dblclick="handleRowDblClick">
+					<el-table-column prop="label" label="label" :width="100"></el-table-column>
+					<el-table-column prop="value" label="value"></el-table-column>
+				</el-table>
             </el-tab-pane>
             <el-tab-pane key="custom_relation" label="关联" name="tab2">
             </el-tab-pane>
@@ -29,91 +25,108 @@ export default {
     data() {
         return {
             baseUrl:'/api/custom_entity_data',
-			metaDataEntityBaseUrl:'/api/custom_entity',
 			
 			next:{item:null, metaData:null},
 			previous:{item:null, metaData:null},
 			
-            entityItemForm: {},
-            entityItemRules:{},
-			entity_metadata:null,
+			data:[],
         };
     },
 	props:{
-		// 元数据，null或''则不做任何事，若为字符串则表示实体名称，需要从服务端拉取元数据定义
-		entity_meta
-		// 一个实体记录，null或''表示需要新建，若为字符串表示记录的guid，需要从服务端拉取数据
-		item:null,
-	
-	
-		// 一个实体项目的guid
-		item_guid:'',
-		// 元数据定义的名称
-		entity_name:'',
+		// 元数据
+		metadata:null,
+		// 一个实体记录，null表示需要新建
+		record:null,
 	},
 	watch:{
-		item_guid:{
+		record:{
 			handler(val,oldVal){
-				console.log('[customEntityInfo.watch.item_guid] %o->%o', oldVal, val);
-				this.refresh();
+				console.log('[customEntityInfo.watch.record] %o->%o', oldVal, val);
+				this.mountRecordData();
 			},
 			deep:true,
 		},
-		entity_name:{
+		metadata:{
 			handler(val,oldVal){
-				console.log('[customEntityInfo.watch.entity_name] %o->%o', oldVal, val);
-				this.refresh();
+				console.log('[customEntityInfo.watch.metadata] %o->%o', oldVal, val);
+				this.mountMetaData();
 			},
 			deep:true,
 		},
 	},
     methods:{
-		// 从后端拉取数据
-		refresh:function(){
-			console.log('[customEntityInfo.refresh()] %o, %o', this.item_guid, this.entity_name);
-
-			if((this.entity_name == '') || (this.entity_name == null)){
-				return;
-			}
-			// 拉取元数据定义
-			axios.get(this.metaDataEntityBaseUrl + '/' + this.entity_name)
-                .then(function (response) {
-                    console.log('[customEntityInfo.refresh()] GET %o, %o', this.metaDataEntityBaseUrl + '/' + this.entity_name, response);
-					this.entity_metadata = response.data;
-
-					// 元数据绑定控件
-					for(var i in (this.entity_metadata!=null?this.entity_metadata.fields:null)){
-						if (this.entityItemForm[this.entity_metadata.fields[i]['name']] == null){
-							this.entityItemForm[this.entity_metadata.fields[i]['name']] = '';
-						}
-					}
-					
-					if((this.item_guid == '') || (this.item_guid == null)){
-						return;
-					}
-					this.entityItemForm.guid = this.item_guid;
-
-					// 查询数据
-					axios.get(this.baseUrl + '/' + this.entity_metadata['name'] + "/" + this.item_guid)
-						.then(function (response) {
-							console.log('[customEntityInfo].refresh()] GET %o, %o', this.baseUrl + '/' + this.item_guid, response);
-							// 绑定数据
-							for(var i in this.entityItemForm){
-								this.entityItemForm[i] = response.data[i];
-							}
-						}.bind(this))
-						.catch(function(error){apiBase.handleAxiosError(error, this);}.bind(this));
-                }.bind(this))
-				.catch(function(error){apiBase.handleAxiosError(error, this);}.bind(this));
+		// 元数据绑定控件
+		mountMetaData(){
+			console.log('[customEntityInfo.mountMetaData(%o,%o)]', this.metadata, this.record);
 		},
-		// 更新或新增数据
+		// 绑定数据
+		mountRecordData(){
+			console.log('[customEntityInfo.mountRecordData(%o,%o)]', this.metadata, this.record);
+			this.data = [];
+			if(this.metadata!=null){
+				var val =(this.record != null)? this.record['guid']: '';
+				if(val == ''){
+					val = apiBase.newGuid();
+				}
+				this.data.push({
+					name:'guid',
+					label:'ID',
+					value:val,
+				});
+				for(var i in this.metadata.fields){
+					var meta_name = this.metadata.fields[i]['name'];
+					var meta_label = this.metadata.fields[i]['label'];
+					var meta_type = this.metadata.fields[i]['type'];
+					var v =(this.record != null)? this.record[meta_name]: null;
+					this.data.push({
+						name:meta_name,
+						label:meta_label,
+						type:meta_type,
+						value:((this.record != null)? this.record[meta_name]: null),
+					});
+				}
+			}
+		},
+		// 更新或新增数据，将触发事件
         onSaveInfo:function () {
-			console.log('[customEntityInfo.onSaveInfo()] %o',this.entityItemForm);
+			console.log('[customEntityInfo.onSaveInfo(%o,%o)]', this.metadata, this.record);
+			var savedInfo = {};
+			for(var i in this.data){
+				savedInfo[this.data[i]['name']] = this.data[i]['value'];
+			}
+			// 保存数据
+			axios.put(this.baseUrl + '/' + this.entityName, [savedInfo])
+				.then(function (response) {
+					console.log('[customEntityInfo.onSaveInfo(%o,%o)]PUT %o %o ok', this.metadata, this.record, this.baseUrl + '/' + this.entityName, savedInfo);
+					// 触发infoSaved事件，传入修改后的记录信息
+					this.$emit('infoSaved', savedInfo);
+				}.bind(this))
+				.catch(function(error){apiBase.handleAxiosError(error, this);}.bind(this));
+
         },
+		// 双击修改
+		handleRowDblClick(row, e){
+			console.log('[customEntityInfo.handleRowDblClick(%o,%o)]%o', this.metadata, this.record, row);
+			if(row['name'] == 'guid')return;
+			
+			this.$prompt('请输入', '提示', {
+				confirmButtonText: '确定',
+				cancelButtonText: '取消',
+				inputValidator:function(inputStr){
+					return inputStr != null;
+				}.bind(this),
+				inputPlaceholder:row['value'],
+			}).then(({ value }) => {
+				row['value'] = value;
+			}).catch(() => {});
+			
+		}
     },
     mounted(){
-		this.refresh();
-    }
+		console.log('[customEntityInfo.mounted(%o,%o)]', this.metadata, this.record);
+		this.mountMetaData();
+		this.mountRecordData();
+    },
 }
 </script>
 

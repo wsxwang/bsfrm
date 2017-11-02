@@ -22,13 +22,16 @@ var newGuid=function(){
 // axios错误发生时调用的函数
 var handleAxiosError=function(error, _this_){
 	console.log('[handleAxiosError()]%o', error.response);
-	var errMsg = _this_.$createElement('div', null , [
-		_this_.$createElement('p', null, String(error) + (error.response !=null?('-' + error.response.statusText):'')),
-		error.response!=null?_this_.$createElement('p', null, 'message: '+ error.response.data):null,
-	]);
+	var errMsg = String(error);
+	if(error.response != null){
+		errMsg += '<br>' + error.response.statusText;
+		errMsg += '<br>' + error.response.data;
+	}
+
 	Message({
 		message:errMsg,
 		showClose:true,
+		dangerouslyUseHTMLString: true,
 		type:'error',
 	});
 }

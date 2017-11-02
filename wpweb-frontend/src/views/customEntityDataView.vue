@@ -11,7 +11,7 @@
 			title="双击查看或修改记录"
 		>
 			<el-table-column prop="guid" label="ID"></el-table-column>
-			<el-table-column v-for="f in entity_metadata['fields']" :key="f.name" :prop="f.name" :label="f.label" show-overflow-tooltip></el-table-column>
+			<el-table-column v-for="f in metadata!=null?metadata['fields']:null" :key="f.name" :prop="f.name" :label="f.label" show-overflow-tooltip></el-table-column>
 			<el-table-column prop="opr" label="操作" fixed="right" width="60"><template slot-scope="scope">
 				<el-button @click.native.prevent="records.splice(scope.$index, 1)" type="text" size="small">移除</el-button>
 			</template></el-table-column>
@@ -26,8 +26,8 @@
 			@current-change="handleCurrentChange"
 		></el-pagination>
 		-->
-		<el-dialog title="xxx" :visible.sync="recordDialogVisible">
-			<customEntityInfo :item_guid="currentRecordGuid" :entity_name="entity_name"></customEntityInfo>
+		<el-dialog :visible.sync="recordDialogVisible" :before-close="handleCloseDlg">
+			<customEntityInfo :record="currentRecord" :metadata="metadata" @infoSaved="handleInfoSaved"></customEntityInfo>
 		</el-dialog>
     </div>
 </template>
@@ -37,6 +37,7 @@
     import axios from 'axios'
 	import apiBase from '../api/apiBase.js'
 	import customEntityInfo from "./customEntityInfo.vue"
+	import { MessageBox  } from 'element-ui';
 
 export default {
     data() {
@@ -44,20 +45,20 @@ export default {
             baseUrl:'/api/custom_entity_data',
 			metaDataEntityBaseUrl:'/api/custom_entity',
 			records:[],					// 当前需要显示在表格中的数据集合
-			currentRecordGuid:'',		// 当前选中记录的guid
-			entity_metadata:{},			// 实体元数据信息
+			currentRecord:null,			// 当前选中的记录
+			metadata:null,				// 实体元数据信息
 			currentPage:1,				// 当前页码
 			recordDialogVisible:false,	// 是否显示一条记录的详情
         };
     },
 	props:{
 		// 实体名称
-		entity_name:'',
+		entityName:'',
 	},
 	watch:{
-		entity_name:{
+		entityName:{
 			handler(val,oldVal){
-				console.log('[customEntityDataView.watch.entity_name] %o->%o', oldVal, val);
+				console.log('[customEntityDataView.watch.entityName] %o->%o', oldVal, val);
 				this.refresh();
 			},
 			deep:true,
@@ -66,20 +67,20 @@ export default {
     methods:{
 		// 从后端拉取数据
 		refresh:function(){
-			console.log('[customEntityDataView.refresh()]%o', this.item_guid, this.entity_name);
-			this.currentRecordGuid = '';
-			if((this.entity_name == '') || (this.entity_name == null)){
+			console.log('[customEntityDataView.refresh(%s)]', this.entityName);
+			this.currentRecord = null;
+			if((this.entityName == '') || (this.entityName == null)){
 				return;
 			}
 			// 拉取元数据定义
-			axios.get(this.metaDataEntityBaseUrl + '/' + this.entity_name)
+			axios.get(this.metaDataEntityBaseUrl + '/' + this.entityName)
                 .then(function (response) {
-                    console.log('[customEntityDataView.refresh()] GET %o, %o', this.metaDataEntityBaseUrl + '/' + this.entity_name, response);
-					this.entity_metadata = response.data;
+                    console.log('[customEntityDataView.refresh(%s)]GET %o, %o',this.entityName, this.metaDataEntityBaseUrl + '/' + this.entityName, response);
+					this.metadata = response.data;
 					// 查询数据
-					axios.get(this.baseUrl + '/' + this.entity_name)
+					axios.get(this.baseUrl + '/' + this.entityName)
 						.then(function (response) {
-							console.log('[customEntityDataView.refresh()] GET %o, %o', this.baseUrl + '/' + this.entity_name, response);
+							console.log('[customEntityDataView.refresh(%s)]GET %o, %o', this.entityName, this.baseUrl + '/' + this.entityName, response);
 							// 绑定数据
 							this.records = response.data;
 						}.bind(this))
@@ -89,11 +90,13 @@ export default {
 		},
 		// 添加记录
 		addRecord:function(){
-			this.popoutRecord('', true);
+			this.currentRecord = null;
+			this.recordDialogVisible = true;
 		},
 		// 字段列表双击某格
 		handleFieldDblClick:function(row, column, cell, e){
-			this.popoutRecord(row['guid'], true);
+			this.currentRecord = row;
+			this.recordDialogVisible = true;
 		},
 		// 改变每页大小
 		handleSizeChange(val) {
@@ -103,15 +106,26 @@ export default {
 		handleCurrentChange(val) {
 			console.log('当前页%d',val);
 		},
-		// 编辑或查看某记录
-		popoutRecord(guid, editable){
-			console.log(guid);
-			this.currentRecordGuid = guid;
-			this.recordDialogVisible = true;
+		// 关闭对话框前提示
+		handleCloseDlg(done){
+			MessageBox.confirm('关闭前请确认已保存修改的内容', '提示', {
+				confirmButtonText: '确定',
+				cancelButtonText: '取消',
+				type: 'warning'
+			}).then(() => {
+				this.recordDialogVisible = false;
+				this.refresh();
+			}).catch(() => {
+			});
 		},
-		
+		// 数据保存成功后的回调函数
+		handleInfoSaved(savedInfo){
+			console.log('[customEntityDataView.handleInfoSaved(%s)]', this.entityName, savedInfo);
+			this.recordDialogVisible = false;
+			this.refresh();
+		}
     },
-    mounted(){
+    beforeMount(){
 		this.refresh();
     },
 	components:{
