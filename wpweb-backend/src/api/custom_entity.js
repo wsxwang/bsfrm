@@ -41,9 +41,7 @@
 */
 
 var assert=require('assert');
-var fs=require("fs");
 var path = require('path');
-var sqlite3=require('sqlite3');
 var dbOpr=require('../cmp/dbOpr_sqlite');
 var base=require('../cmp/base');
 
@@ -53,7 +51,6 @@ const fileName_data = path.join(__dirname, '../../public/db/custom_data.db')
 // 返回所有实体定义（包含字段），返回数组
 var allCompleteEntityMetaData=function () {
 	base.logger4js.trace("[allCompleteEntityMetaData()]");
-	var sqlStr = "";
 	var ret = [];
 	
 	var names = allEntityName();	

@@ -24,7 +24,7 @@ component custom_er:custom entity-relation model
 	entity meta-data: described in /src/api/custom_entity.js
 
 	/src/api/custom_entity_data.js: custom entity data access api
-    /routes/custom_entity_data.js: route restful api "http://xxx/api/custom_data/:entity-name/"
+    /routes/custom_entity_data.js: route restful api "http://xxx/api/custom_entity_data/:entity-name/"
 	
     /src/api/custom_relation.js: custom entity api
     /routes/custom_relation.js: route restful api "http://xxx/api/custom_relation"
@@ -36,5 +36,5 @@ component custom_er:custom entity-relation model
 webserice api:
 http://xxx/api/users
 http://xxx/api/custom_entity
-http://xxx/api/custom_data
+http://xxx/api/custom_entity_data
 http://xxx/api/custom_relation
