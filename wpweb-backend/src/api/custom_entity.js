@@ -87,7 +87,7 @@ var allEntityName=function(){
 	return ret;
 }
 
-// 根据实体name字段获取该实体的完整元数据（包括字段定义）
+// 根据实体name字段获取该实体的完整元数据（包括字段定义），不存在则返回null
 var completeEntityMetaData=function(name){
 	base.logger4js.trace("[completeEntityMetaData(%s)]",name);
 	var sqlStr = "";
@@ -97,7 +97,7 @@ var completeEntityMetaData=function(name){
 	sqlStr = "SELECT tbl_name FROM SQLITE_MASTER WHERE tbl_name = 'TBL_DATA_" + name + "'";
     var data_ret = dbOpr.exec_sync(fileName_data, sqlStr);
 	if ('error' in data_ret){throw data_ret;}
-	if (data_ret.length != 1) return ret;	// 实体不存在
+	if (data_ret.length != 1) return null;	// 实体不存在
 	ret['name']= name;
 	base.logger4js.trace("[completeEntityMetaData(%s)]data table found",name);
 
@@ -152,8 +152,8 @@ var completeEntityMetaData=function(name){
 // 更新一批实体定义，参数是数组，对于其中每一个元素，将检查实体定义是否存在，若不存在则新建，否则只更新
 var updateEntitys=function (entitys) {
 	base.logger4js.trace("[updateEntitys(%d)]",entitys.length);
-	if((entitys instanceof Array)==false) throw Error('format error');
-	if(entitys.length==0) throw Error('format error');
+	if((entitys instanceof Array)==false) throw new Error('format error');
+	if(entitys.length==0) throw new Error('format error');
 	
 	var names = allEntityName();
 	base.logger4js.trace("[updateEntitys(%d)]entity names in db: ",entitys.length, names);
@@ -176,7 +176,7 @@ var newEntity=function (entity) {
 	var ret = null;
 	
 	if(checkEntityFmt(entity)==false){
-        throw Error('format error');
+        throw new Error('format error');
 	}
 	
 	// 创建数据表
@@ -227,7 +227,7 @@ var updateEntity=function(entity) {
 	var ret = null;
 
 	if(checkEntityFmt(entity)==false){
-        throw Error('format error');
+        throw new Error('format error');
 	}
 	
 	// 查找库中的旧定义
@@ -288,7 +288,7 @@ var updateEntity=function(entity) {
 				// 该字段在旧定义中存在，判断类型是否需要修改
 				if(oldEntity['fields'][oldIndex]['type']!= entity['fields'][i]['type']){
 					// 修改数据表的字段类型，暂不支持！！！
-					throw Error("filed(data table column) type modify not supported");
+					throw new Error("filed(data table column) type modify not supported");
 					sqlStr="ALTER TABLE TBL_DATA_" + entity['name']+ ' ALTER COLUMN ' + entity['fields'][i]['name']+ ' ' + entity['fields'][i]['type'];
 					ret = dbOpr.exec_sync(fileName_data, sqlStr);
 					if(ret != 0){
@@ -304,7 +304,7 @@ var updateEntity=function(entity) {
 			if(entity['fields'].findIndex(function(v){return oldEntity['fields'][i]['name']==v['name'];})==-1){
 				// 删除字段
 				// 删除数据表的字段，暂不支持！！！
-				throw Error("filed(data table column) delete not supported");
+				throw new Error("filed(data table column) delete not supported");
 				sqlStr="ALTER TABLE TBL_DATA_" + entity['name']+ ' DROP COLUMN ' + oldEntity['fields'][i]['name'];
 				ret = dbOpr.exec_sync(fileName_data, sqlStr);
 				if(ret != 0){
@@ -362,7 +362,7 @@ var checkEntityFmt=function (entity) {
     if (entity==null) {
         return false;
     }
-    if ((entity['name']==null) || (entity['name']=='') || (entity['name']=='names')) {
+    if ((entity['name']==null) || (entity['name']=='') || (entity['name']=='names') || (entity['name'].indexOf('-')!=-1)) {
         return false;
     }
     if ((entity['label']==null) || entity['label']=='') {

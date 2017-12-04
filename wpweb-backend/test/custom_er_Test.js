@@ -1,16 +1,17 @@
 var assert = require('assert');
 var dbOpr = require('../src/cmp/dbOpr_sqlite');
 var api= require('../src/api/custom_entity');
+var data_api = require('../src/api/custom_entity_data');
 
 describe('custom_er', function () {
 	describe('entity and fields define test', function(){
 		var timeStamp = new Date();
-		var newEntity1={name:timeStamp.getTime().toString()+'-01', label:'test01', title:'mocha test entity 01', fields:[
-			{eName:timeStamp.getTime().toString()+'-01', name:'f1', label:'column1', type:'varchar2(255)', title:'mocha test entity field 1'},
+		var newEntity1={name:timeStamp.getTime().toString()+'_01', label:'test01', title:'mocha test entity 01', fields:[
+			{eName:timeStamp.getTime().toString()+'_01', name:'f1', label:'column1', type:'varchar2(255)', title:'mocha test entity field 1'},
 		]};
-		var newEntity2={name:timeStamp.getTime().toString()+'-02', label:'test02', title:'mocha test entity 02', fields:[
-			{eName:timeStamp.getTime().toString()+'-01', name:'f1', label:'column1', type:'varchar2(255)', title:'mocha test entity field 1'},
-			{eName:timeStamp.getTime().toString()+'-02', name:'f2', label:'column2', type:'number', title:'mocha test entity field 2'},
+		var newEntity2={name:timeStamp.getTime().toString()+'_02', label:'test02', title:'mocha test entity 02', fields:[
+			{eName:timeStamp.getTime().toString()+'_02', name:'f1', label:'column1', type:'varchar2(255)', title:'mocha test entity field 1'},
+			{eName:timeStamp.getTime().toString()+'_02', name:'f2', label:'column2', type:'number', title:'mocha test entity field 2'},
 		]};
 		
 		after(function(done){
@@ -26,6 +27,7 @@ describe('custom_er', function () {
 			assert(api.checkEntityFmt({}) == false, "empty, should false");
 			assert(api.checkEntityFmt({label:'l',fields:[{eName:'n', name:'f',label:'l',type:'varchar2(255)'}]}) == false, "name null, should false");
 			assert(api.checkEntityFmt({name:'',label:'l',fields:[{eName:'n', name:'f',label:'l',type:'varchar2(255)'}]}) == false, "name empty, should false");
+			assert(api.checkEntityFmt({name:'aa-aa',label:'l',fields:[{name:'f',label:'l',type:'varchar2(255)'}]}) == false, "name contains -, should false");
 			assert(api.checkEntityFmt({name:'n',fields:[{eName:'n', name:'f',label:'l',type:'varchar2(255)'}]}) == false, "label null, should false");
 			assert(api.checkEntityFmt({name:'n',label:'',fields:[{eName:'n', name:'f',label:'l',type:'varchar2(255)'}]}) == false, "label empty, should false");
 			assert(api.checkEntityFmt({name:'n',label:'l',}) == false, "fields null, should false");
@@ -64,9 +66,8 @@ describe('custom_er', function () {
 				assert.equal(entity, null, "should not found");
 			}catch(err){
 				assert(false, "should not throw," + err);
-			}finally{
-				done();
 			}
+			done();
 		});
 		it('insert entity test', function(done){
 			try{
@@ -82,17 +83,15 @@ describe('custom_er', function () {
 				for(var i in entity['fields']){
 					var index = newEntity2['fields'].findIndex(function(v){return v['name']==entity['fields'][i]['name'];});
 					assert(index >= 0, 'filed ' + entity['fields'][i]['name'] + ' should found');
-					assert.equal(entity['fields'][i]['eName'], newEntity2['fields'][index]['eName'], 'field eName should same');
 					assert.equal(entity['fields'][i]['name'], newEntity2['fields'][index]['name'], 'field name should same');
-					assert.equal(entity['fields'][i]['label'], newEntity2['label'][index]['eName'], 'field label should same');
+					assert.equal(entity['fields'][i]['label'], newEntity2['fields'][index]['label'], 'field label should same');
 					assert.equal(entity['fields'][i]['title'], newEntity2['fields'][index]['title'], 'field title should same');
 					assert.equal(entity['fields'][i]['type'], newEntity2['fields'][index]['type'], 'field type should same');
 				}
 			}catch(err){
 				assert(false, "should not throw," + err);
-			}finally{
-				done();
 			}
+			done();
 		});
 		it('update entity test', function(done){
 			try{
@@ -111,17 +110,15 @@ describe('custom_er', function () {
 				for(var i in entity['fields']){
 					var index = changedEntity['fields'].findIndex(function(v){return v['name']==entity['fields'][i]['name'];});
 					assert(index >= 0, 'filed ' + entity['fields'][i]['name'] + ' should found');
-					assert.equal(entity['fields'][i]['eName'], changedEntity['fields'][index]['eName'], 'field eName should same');
 					assert.equal(entity['fields'][i]['name'], changedEntity['fields'][index]['name'], 'field name should same');
-					assert.equal(entity['fields'][i]['label'], changedEntity['label'][index]['eName'], 'field label should same');
+					assert.equal(entity['fields'][i]['label'], changedEntity['fields'][index]['label'], 'field label should same');
 					assert.equal(entity['fields'][i]['title'], changedEntity['fields'][index]['title'], 'field title should same');
 					assert.equal(entity['fields'][i]['type'], changedEntity['fields'][index]['type'], 'field type should same');
 				}
 			}catch(err){
 				assert(false, "should not throw," + err);
-			}finally{
-				done();
 			}
+			done();
 		});
 		it('update entity fail test', function(done){
 			try{
@@ -135,7 +132,6 @@ describe('custom_er', function () {
 				assert(false, "should throw");
 			}catch(err){
 				assert(true, "should throw,"+err);
-			}finally{
 			}
 			try{
 				var changedEntity={name:newEntity2['name'], label:newEntity2['label'], title:'mocha test entity 02 delete field fail', fields:[
@@ -146,19 +142,66 @@ describe('custom_er', function () {
 				assert(false, "should throw");
 			}catch(err){
 				assert(true, "should throw,"+err);
-			}finally{
-				done();
 			}
+			done();
 		});
 		it('delete entity test', function(done){
 			try{
-				api.delEntitys([newEntity1['name'], newEntity2['name']]);
-				api.delEntitys([newEntity1['name'], newEntity2['name']]);
+				api.delEntitys(newEntity1['name']+","+newEntity2['name']);
+				api.delEntitys(newEntity1['name']+","+newEntity2['name']);
 			}catch(err){
 				assert(false, "should not throw," + err);
-			}finally{
-				done();
 			}
+			done();
 		});
 	});
+	
+	describe('entity data access test', function(){
+		var timeStamp = new Date();
+		var entityName = timeStamp.getTime().toString()+'_access';
+		var accessEntity={name:entityName, label:'test01', title:'mocha test entity data access', fields:[
+			{name:'f1', label:'column1', type:'varchar2(255)', title:'mocha test entity access field 1'},
+			{name:'f2', label:'column2', type:'number', title:'mocha test entity access field 2'},
+		]};
+		
+		after(function(done){
+			console.log('you may need to delete entity manually:%s', entityName);
+			done();
+		});
+		
+		it('access undefined entity', function(done){
+			try{
+				data_api.allRecords(entityName);
+				assert(false, "should throw: allRecords");
+			}catch(err){
+				assert(true);
+			}
+			try{
+				data_api.recordByGuid(entityName, 'xxx');
+				assert(false, "should throw: recordByGuid");
+			}catch(err){
+				assert(true);
+			}
+			try{
+				data_api.delRecords(entityName, 'xx,xx');
+				assert(false, "should throw: delRecords");
+			}catch(err){
+				assert(true);
+			}
+			try{
+				data_api.updateRecords(entityName,[]);
+				assert(false, "should throw: updateRecords");
+			}catch(err){
+				assert(true);
+			}
+			done();
+		});
+		
+		it('access', function(done){
+			api.updateEntitys([accessEntity]);
+			api.delEntitys(entityName);
+			done();
+		});
+	});
+	
 });

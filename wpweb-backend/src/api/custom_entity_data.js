@@ -47,7 +47,8 @@ var recordByGuid=function(ename, guid){
 	}
 };
 
-// 在表名为ename的表中根据guid数组删除记录
+// 在表名为ename的表中根据guid集合删除记录
+// guidArray：字符串，以逗号隔开
 var delRecords=function(ename, guidArray){
 	base.logger4js.trace("[delRecords(%o,%o)]", ename, guidArray);
 	var sqlStr = "";
