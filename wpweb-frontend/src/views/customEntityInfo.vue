@@ -95,9 +95,9 @@ export default {
 				savedInfo[this.data[i]['name']] = this.data[i]['value'];
 			}
 			// 保存数据
-			axios.put(this.baseUrl + '/' + this.entityName, [savedInfo])
+			axios.put(this.baseUrl + '/' + this.metadata['name'], [savedInfo])
 				.then(function (response) {
-					console.log('[customEntityInfo.onSaveInfo(%o,%o)]PUT %o %o ok', this.metadata, this.record, this.baseUrl + '/' + this.entityName, savedInfo);
+					console.log('[customEntityInfo.onSaveInfo(%o,%o)]PUT %o %o ok', this.metadata, this.record, this.baseUrl + '/' + this.metadata['name'], savedInfo);
 					// 触发infoSaved事件，传入修改后的记录信息
 					this.$emit('infoSaved', savedInfo);
 				}.bind(this))
