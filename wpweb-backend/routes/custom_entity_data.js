@@ -31,7 +31,7 @@ router.get('/:eName', function (req, res, next) {
     }
 })
 
-// 获取指定实体的指定所有数据记录，返回数据数组
+// 获取指定实体的指定guid的数据记录，返回{guid:'...',...}或null
 router.get('/:eName/:guid', function (req, res, next) {
 	base.logger4js_api.trace("[GET %s%s(%s,%s)]",req.baseUrl, req.path, req.params.eName, req.params.guid);
     res.header('Content-Type', 'application/json;charset=utf-8');
