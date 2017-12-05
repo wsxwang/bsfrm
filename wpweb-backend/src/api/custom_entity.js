@@ -50,11 +50,11 @@ const fileName_data = path.join(__dirname, '../../public/db/custom_data.db')
 
 // 返回所有实体定义（包含字段），返回数组
 var allCompleteEntityMetaData=function () {
-	base.logger4js.trace("[allCompleteEntityMetaData()]");
+	base.logger4js_api.trace("[allCompleteEntityMetaData()]");
 	var ret = [];
 	
 	var names = allEntityName();	
-	base.logger4js.trace("[allCompleteEntityMetaData()]%d entity names found", names.length);
+	base.logger4js_api.trace("[allCompleteEntityMetaData()]%d entity names found", names.length);
 	for(var i in names){
 		var metadata = completeEntityMetaData(names[i]);
 		if(metadata['name']!= null){
@@ -62,13 +62,13 @@ var allCompleteEntityMetaData=function () {
 		}
 	}
 
-	base.logger4js.trace("[allCompleteEntityMetaData()]%d entity found success", ret.length);
+	base.logger4js_api.trace("[allCompleteEntityMetaData()]%d entity found success", ret.length);
 	return ret;
 }
 
 // 返回所有实体名(name)，返回数组
 var allEntityName=function(){
-	base.logger4js.trace("[allEntityName()]");
+	base.logger4js_api.trace("[allEntityName()]");
 	var sqlStr = "";
 	var ret = [];
 	
@@ -76,20 +76,20 @@ var allEntityName=function(){
 	sqlStr = "SELECT tbl_name FROM SQLITE_MASTER WHERE tbl_name like 'TBL_DATA_%'";
     var data_ret = dbOpr.exec_sync(fileName_data, sqlStr);
 	if ('error' in data_ret){throw data_ret;}
-	base.logger4js.trace("[allEntityName()]%d entity found", data_ret.length);
+	base.logger4js_api.trace("[allEntityName()]%d entity found", data_ret.length);
 	if (data_ret.length==0) return ret;	// 实体不存在
 	
 	for(var i in data_ret){
 		ret.push(data_ret[i]['tbl_name'].substring(9));
 	}
 
-	base.logger4js.trace("[allEntityName()]%d entity names success", ret.length);
+	base.logger4js_api.trace("[allEntityName()]%d entity names success", ret.length);
 	return ret;
 }
 
 // 根据实体name字段获取该实体的完整元数据（包括字段定义），不存在则返回null
 var completeEntityMetaData=function(name){
-	base.logger4js.trace("[completeEntityMetaData(%s)]",name);
+	base.logger4js_api.trace("[completeEntityMetaData(%s)]",name);
 	var sqlStr = "";
 	var ret = {};
 	
@@ -99,7 +99,7 @@ var completeEntityMetaData=function(name){
 	if ('error' in data_ret){throw data_ret;}
 	if (data_ret.length != 1) return null;	// 实体不存在
 	ret['name']= name;
-	base.logger4js.trace("[completeEntityMetaData(%s)]data table found",name);
+	base.logger4js_api.trace("[completeEntityMetaData(%s)]data table found",name);
 
 	// 在元数据表中查找实体的定义
 	sqlStr = "SELECT name,label,title FROM TBL_meta_EntityDefine WHERE name='" + name + "'";
@@ -112,19 +112,19 @@ var completeEntityMetaData=function(name){
 		ret['label']= meta_ret[0]['label'];
 		ret['title']= meta_ret[0]['title'];
 	}
-	base.logger4js.trace("[completeEntityMetaData(%s)]meta data found",name);
+	base.logger4js_api.trace("[completeEntityMetaData(%s)]meta data found",name);
 
 	// 查找该表的所有字段
 	sqlStr = "PRAGMA TABLE_INFO('TBL_DATA_" + name + "')";
     data_ret = dbOpr.exec_sync(fileName_data, sqlStr);
 	if ('error' in data_ret){throw data_ret;}
-	base.logger4js.trace("[completeEntityMetaData(%s)]data table %d columns found",name, data_ret.length);
+	base.logger4js_api.trace("[completeEntityMetaData(%s)]data table %d columns found",name, data_ret.length);
 	
 	// 在元数据表中查找字段的定义
 	sqlStr = "SELECT eName,name,label,title FROM TBL_meta_EntityFieldDefine WHERE eName='" + name + "'";
     meta_ret = dbOpr.exec_sync(fileName_meta, sqlStr);
 	if ('error' in meta_ret){throw meta_ret;}
-	base.logger4js.trace("[completeEntityMetaData(%s)]meta data %d fields found",name, meta_ret.length);
+	base.logger4js_api.trace("[completeEntityMetaData(%s)]meta data %d fields found",name, meta_ret.length);
 
 	// 两个返回值join，以实际的数据表为基准
 	var fields=[];
@@ -145,20 +145,20 @@ var completeEntityMetaData=function(name){
 		fields.push(field);
 	}
 	ret['fields']= fields;
-	base.logger4js.trace("[completeEntityMetaData(%s)]found success",name);
+	base.logger4js_api.trace("[completeEntityMetaData(%s)]found success",name);
 	return ret;
 }
 
 // 更新一批实体定义，参数是数组，对于其中每一个元素，将检查实体定义是否存在，若不存在则新建，否则只更新
 var updateEntitys=function (entitys) {
-	base.logger4js.trace("[updateEntitys(%d)]",entitys.length);
+	base.logger4js_api.trace("[updateEntitys(%d)]",entitys.length);
 	if((entitys instanceof Array)==false) throw new Error('format error');
 	if(entitys.length==0) throw new Error('format error');
 	
 	var names = allEntityName();
-	base.logger4js.trace("[updateEntitys(%d)]entity names in db: ",entitys.length, names);
+	base.logger4js_api.trace("[updateEntitys(%d)]entity names in db: ",entitys.length, names);
 	entitys.forEach(function(item, index, arr){
-		base.logger4js.trace("[updateEntitys(%d)]insert or update entity %s",entitys.length, item['name']);
+		base.logger4js_api.trace("[updateEntitys(%d)]insert or update entity %s",entitys.length, item['name']);
 		if(names.findIndex(function(v, i, a){if(v==item['name']){return true;}})==-1){
 			// 新增
 			newEntity(item);
@@ -171,7 +171,7 @@ var updateEntitys=function (entitys) {
 
 // 新建一个实体定义（包含字段），将创建实体元数据及数据表
 var newEntity=function (entity) {
-	base.logger4js.trace("[newEntity(%s)]", entity['name']);
+	base.logger4js_api.trace("[newEntity(%s)]", entity['name']);
 	var sqlStr = '';
 	var ret = null;
 	
@@ -192,7 +192,7 @@ var newEntity=function (entity) {
 	if('error' in ret){
         throw ret;
     }
-	base.logger4js.trace("[newEntity(%s)]create data table success", entity['name']);
+	base.logger4js_api.trace("[newEntity(%s)]create data table success", entity['name']);
 
 	// 插入实体元数据定义
 	var insertEntitys=[{name:entity['name'],label:entity['label'],title:entity['title']}];
@@ -200,7 +200,7 @@ var newEntity=function (entity) {
     if('error' in ret){
         throw ret;
     }
-	base.logger4js.trace("[newEntity(%s)]create meta data success", entity['name']);
+	base.logger4js_api.trace("[newEntity(%s)]create meta data success", entity['name']);
 	
 	// 插入字段元数据定义
 	var insertFields=[];
@@ -216,13 +216,13 @@ var newEntity=function (entity) {
     if('error' in ret){
         throw ret;
     }
-	base.logger4js.trace("[newEntity(%s)]create %d fields meta data success", entity['name'], insertFields.length);
+	base.logger4js_api.trace("[newEntity(%s)]create %d fields meta data success", entity['name'], insertFields.length);
 }
 
 // 更新一个实体定义，实体定义本身仅需更新元数据信息，字段信息的变更需要更改数据表
 // 不支持字段改名，不支持字段删除，不支持字段类型修改
 var updateEntity=function(entity) {
-	base.logger4js.trace("[updateEntity(%s)]", entity['name']);
+	base.logger4js_api.trace("[updateEntity(%s)]", entity['name']);
 	var sqlStr = '';
 	var ret = null;
 
@@ -233,7 +233,7 @@ var updateEntity=function(entity) {
 	// 查找库中的旧定义
 	var oldEntity = completeEntityMetaData(entity['name']);
 	assert(oldEntity != null);
-	base.logger4js.trace("[updateEntity(%s)]old defination found", entity['name']);
+	base.logger4js_api.trace("[updateEntity(%s)]old defination found", entity['name']);
 	
 	if((oldEntity['label']!=entity['label'])||(oldEntity['title']!=entity['title'])){
 		// 修改元数据定义
@@ -242,9 +242,9 @@ var updateEntity=function(entity) {
 		if(ret != 0){
 			throw ret;
 		}
-		base.logger4js.trace("[updateEntity(%s)]update meta data success", entity['name']);
+		base.logger4js_api.trace("[updateEntity(%s)]update meta data success", entity['name']);
 	}else{
-		base.logger4js.trace("[updateEntity(%s)]entity(without fields) meta data same, do not update", entity['name']);
+		base.logger4js_api.trace("[updateEntity(%s)]entity(without fields) meta data same, do not update", entity['name']);
 	}
 	
 	if(true){//... 字段是否需要修改未实现
@@ -255,7 +255,7 @@ var updateEntity=function(entity) {
 		if(ret != 0){
 			throw ret;
 		}
-		base.logger4js.trace("[updateEntity(%s)]delete column meta data success", entity['name']);
+		base.logger4js_api.trace("[updateEntity(%s)]delete column meta data success", entity['name']);
 		var insertFields=[];
 		for(var i in entity['fields']){
 			insertFields.push({
@@ -269,7 +269,7 @@ var updateEntity=function(entity) {
 		if('error' in ret){
 			throw ret;
 		}
-		base.logger4js.trace("[updateEntity(%s)]create %d fields meta data success", entity['name'], insertFields.length);
+		base.logger4js_api.trace("[updateEntity(%s)]create %d fields meta data success", entity['name'], insertFields.length);
 
 		// 逐个字段
 		for(var i in entity['fields']){
@@ -282,7 +282,7 @@ var updateEntity=function(entity) {
 				if(ret != 0){
 					throw ret;
 				}
-				base.logger4js.trace("[updateEntity(%s)]add column %s success", entity['name'], entity['fields'][i]['name']);
+				base.logger4js_api.trace("[updateEntity(%s)]add column %s success", entity['name'], entity['fields'][i]['name']);
 			}else{
 				var sqlArray = [];
 				// 该字段在旧定义中存在，判断类型是否需要修改
@@ -294,9 +294,9 @@ var updateEntity=function(entity) {
 					if(ret != 0){
 						throw ret;
 					}
-					base.logger4js.trace("[updateEntity(%s)]modify column %s type success", entity['name'], entity['fields'][i]['name']);
+					base.logger4js_api.trace("[updateEntity(%s)]modify column %s type success", entity['name'], entity['fields'][i]['name']);
 				}else{
-					base.logger4js.trace("[updateEntity(%s)]column %s type do not need modify", entity['name'], entity['fields'][i]['name']);
+					base.logger4js_api.trace("[updateEntity(%s)]column %s type do not need modify", entity['name'], entity['fields'][i]['name']);
 				}
 			}
 		}
@@ -310,30 +310,30 @@ var updateEntity=function(entity) {
 				if(ret != 0){
 					throw ret;
 				}
-				base.logger4js.trace("[updateEntity(%s)]delete column %s success", entity['name'], entity['fields'][i]['name']);
+				base.logger4js_api.trace("[updateEntity(%s)]delete column %s success", entity['name'], entity['fields'][i]['name']);
 			}
 		}
-		base.logger4js.trace("[updateEntity(%s)]modify %d column data success", entity['name'], entity['fields'].length);
+		base.logger4js_api.trace("[updateEntity(%s)]modify %d column data success", entity['name'], entity['fields'].length);
 	}
 	else{
-		base.logger4js.trace("[updateEntity(%s)]fields configure do not need modify", entity['name']);
+		base.logger4js_api.trace("[updateEntity(%s)]fields configure do not need modify", entity['name']);
 	}
 }
 
 // 根据名称删除一批实体定义，参数：name1,name2,...
 var delEntitys=function(names){
-	base.logger4js.trace("[delEntitys(%s)]", names);
+	base.logger4js_api.trace("[delEntitys(%s)]", names);
 
 	var nameArray=names.split(',');
 	for(var i in nameArray){
 		delEntity(nameArray[i]);
 	}
-	base.logger4js.trace("[delEntitys(%s)]OK", names);
+	base.logger4js_api.trace("[delEntitys(%s)]OK", names);
 }
 
 // 根据名称删除实体定义，顺序：1、删除数据；2、删除字段定义；3、删除实体定义
 var delEntity=function(name){
-	base.logger4js.trace("[delEntity(%s)]", name);
+	base.logger4js_api.trace("[delEntity(%s)]", name);
 	var ret = null;
 	
 	// 删除数据表
@@ -342,7 +342,7 @@ var delEntity=function(name){
 	if(ret != 0){
         throw ret;
     }
-	base.logger4js.trace("[delEntity(%s)]delete data table success", name);
+	base.logger4js_api.trace("[delEntity(%s)]delete data table success", name);
 	
 	// 删除元数据定义
 	var sqlStr1="DELETE FROM TBL_meta_EntityFieldDefine WHERE eName='" + name + "'";
@@ -351,7 +351,7 @@ var delEntity=function(name){
 	if('error' in ret){
         throw ret;
     }
-	base.logger4js.trace("[delEntity(%s)]delete meta data success", name);
+	base.logger4js_api.trace("[delEntity(%s)]delete meta data success", name);
 }
 
 ////////////////////////////////////////////////////////////

@@ -16,7 +16,7 @@ var base = require('./base');
 handle=function(err, allRecords){}
 */
 var queryAll=function(fileName, sqlStr, handle){
-	base.logger4js_db.trace('queryAll(%s,%s)',fileName, sqlStr);
+	base.logger4js_db.debug('queryAll(%s,%s)',fileName, sqlStr);
 	assert(typeof(handle)=='function');
     assert((fileName != null) && (fileName != ''));
     assert((sqlStr != null) && (sqlStr != ''));
@@ -34,7 +34,7 @@ var queryAll=function(fileName, sqlStr, handle){
 handle=function(err){}，执行后调用
 */
 var execBatch=function(fileName, sqlArray, handle){
-	base.logger4js_db.trace('execBatch(%s,%o)',fileName, sqlArray);
+	base.logger4js_db.debug('execBatch(%s,%o)',fileName, sqlArray);
 	assert(typeof(handle)=='function');
     assert(sqlArray instanceof Array);
     assert(sqlArray.length > 0);
@@ -59,7 +59,7 @@ var execBatch=function(fileName, sqlArray, handle){
 返回值依赖于sql执行结果，若发生错误，返回一个错误对象
 */
 var exec_sync=function(fileName, sqlStr){
-	base.logger4js_db.trace('exec_sync(%s,%s)',fileName, sqlStr);
+	base.logger4js_db.debug('exec_sync(%s,%s)',fileName, sqlStr);
     assert((fileName != null) && (fileName != ''));
     assert((sqlStr != null) && (sqlStr != ''));
 
@@ -75,7 +75,7 @@ var exec_sync=function(fileName, sqlStr){
 语句一条一条执行，若失败则终止并返回错误信息，若成功则将返回值作为要给数组返回
 */
 var execBatch_sync=function(fileName, sqlArray){
-	base.logger4js_db.trace('execBatch_sync(%s,%o)',fileName, sqlArray);
+	base.logger4js_db.debug('execBatch_sync(%s,%o)',fileName, sqlArray);
     assert((fileName != null) && (fileName != ''));
     assert(sqlArray instanceof Array);
     assert(sqlArray.length > 0);
@@ -102,7 +102,7 @@ records：数组，元素是JSON对象，key与数据库字段一一对应
 数据是一条一条插入，若失败则终止并返回错误信息，若成功返回插入的行ID的数组
  */
 var insert_sync=function (fileName, tblName, records) {
-	base.logger4js_db.trace('insert_sync(%s,%s,%o)',fileName, tblName,records);
+	base.logger4js_db.debug('insert_sync(%s,%s,%o)',fileName, tblName,records);
     assert((fileName != null) && (fileName != ''));
     assert((tblName != null) && (tblName != ''));
     assert(records instanceof Array);

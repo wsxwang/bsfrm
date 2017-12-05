@@ -164,7 +164,12 @@ describe('custom_er', function () {
 			{name:'f2', label:'column2', type:'number', title:'mocha test entity access field 2'},
 		]};
 		
+		before(function(done){
+			api.updateEntitys([accessEntity]);
+			done();
+		});
 		after(function(done){
+			api.delEntitys(entityName);
 			console.log('you may need to delete entity manually:%s', entityName);
 			done();
 		});
@@ -197,9 +202,81 @@ describe('custom_er', function () {
 			done();
 		});
 		
-		it('access', function(done){
-			api.updateEntitys([accessEntity]);
-			api.delEntitys(entityName);
+		it.skip('parameter error test', function(done){
+		});
+		
+		it('find while empty', function(done){
+			var ret = null;
+			try{
+				ret = data_api.allRecords(entityName);
+				assert.equal(ret.length, 0, "should empty");
+				
+				ret = data_api.recordByGuid(entityName, 'xxx');
+				assert.equal(ret, null, "should null");
+			}catch(err){
+				assert(false, 'should not throw ' + err);
+			}
+			done();
+		});
+
+		it('insert one -> find', function(done){
+			var rec1 = {guid:'rec1', f1:'a', f2:1};
+			try{
+				data_api.updateRecords(entityName, [rec1]);
+				var ret = data_api.allRecords(entityName);
+				assert.equal(ret.length, 1, "should get one");
+				var rec = null;
+				rec = data_api.recordByGuid(entityName, ret[0]['guid']);
+				assert(rec!=null, "should not null");
+
+				assert.equal(ret[0]['guid'], rec['guid'], "guid should equal");
+				assert.equal(ret[0]['f1'],rec['f1'], "f1 should equal");
+				assert.equal(ret[0]['f2'],rec['f2'], "f2 should equal");
+				assert.equal(rec['guid'],'rec1', "guid should 'rec1'");
+				assert.equal(rec['f1'],'a', "f1 should 'a'");
+				assert.equal(rec['f2'],1, "f2 should 2");
+			}catch(err){
+				assert(false, 'should not throw ' + err);
+			}
+			done();
+		});
+		
+		it('update and insert', function(done){
+			var rec1 = {guid:'rec1', f1:'aa', f2:11};
+			var rec2 = {f1:'bb', f2:22};
+			var rec3 = {guid:'rec3', f1:'bb', f2:22};
+			try{
+				data_api.updateRecords(entityName, [rec1, rec2, rec3]);
+				var ret = data_api.allRecords(entityName);
+				assert.equal(ret.length, 3, "should get 3 records");
+				
+				var index = ret.findIndex(function(v){return v['f1']=='aa';});
+				assert(index!=-1, "rec1 f1 should change to aa");
+				assert.equal(ret[index]['guid'], 'rec1', "rec1 guid should still rec1");
+				assert.equal(ret[index]['f2'], 11, "rec1 f2 should change to 11");
+				
+				var index = ret.findIndex(function(v){return v['f1']=='bb';});
+				assert(index!=-1, "new rec2 should exist");
+				assert(ret[index]['guid']!=null, "rec2 guid should not null");
+				assert.equal(ret[index]['f2'], 22, "rec2 f2 should be 22");
+			}catch(err){
+				assert(false, 'should not throw ' + err);
+			}
+			done();
+		});
+		it('delete', function(done){
+			try{
+				data_api.delRecords(entityName, 'rec1,rec3');
+				var ret = data_api.allRecords(entityName);
+				assert.equal(ret.length, 1, "should 1 left");
+				
+				ret = data_api.recordByGuid(entityName, 'rec1');
+				assert.equal(ret, null, "rec1 should be deleted");
+				ret = data_api.recordByGuid(entityName, 'rec3');
+				assert.equal(ret, null, "rec3 should be deleted");
+			}catch(err){
+				assert(false, 'should not throw ' + err);
+			}
 			done();
 		});
 	});

@@ -10,8 +10,10 @@ var logger4js_db=log4js.getLogger('db');
 var logger4js_access=log4js.getLogger('access');
 // api访问日志
 var logger4js_api=log4js.getLogger('api');
+// 所有日志
+var logger4js_everything=log4js.getLogger('everything');
 // 一般日志
-var logger4js=log4js.getLogger('everything');
+var logger4js=log4js.getLogger('default');
 
 
 // 将字符串格式的json转换为object，如果s是oject格式则直接返回，其他情况返回null
