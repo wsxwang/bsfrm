@@ -3,7 +3,6 @@ var path = require('path');
 var router = express.Router();
 
 var api = require(path.join(__dirname, '../src/api/custom_entity_data'));
-var api_meta = require(path.join(__dirname, '../src/api/custom_entity'));
 var base = require(path.join(__dirname, '../src/cmp/base'));
 
 /*
