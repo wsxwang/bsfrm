@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>wpweb api</title>
+  </head>
+  <body>
+	<H1>
+	<p>
+	<H2>custom_entity</H2>
+	<h3>概述</h3>
+	url:/api/custom_entity<BR/>
+	method:GET/PUT/DELETE<BR/>
+	<h3>用法</h3>
+	<li>查找所有实体 GET /api/custom_entity
+		<p style="font-style:italic">查询的返回值是数组：[{name:'',label:'',title:'',fields:[name:'',type:'',label:'',title:'']},...]</p>
+	</li>
+	<li>查找所有的实体名: GET /api/custom_entity/name
+		<p style="font-style:italic">查询的返回值是数组：['xxx','xxx',...]</p>
+	</li>
+	<li>根据名称查找: GET /api/custom_entity/:name
+		<p style="font-style:italic">查询的返回值是对象：{...}</p>
+	</li>
+	<li>修改或新增一批实体: PUT /api/custom_entity/
+		<p style="font-style:italic">若实体名存在则修改实体信息，否则新增。
+		<BR/>参数是一个数组 [{name:xxx,...},{}...]</p>
+	</li>
+	<li>删除一批实体定义: PUT /api/custom_entity/</li>
+	<p style="font-style:italic">若需要删除的实体不存在则不做任何事。<br/>参数是需要删除的实体名字符串，用逗号分割：xxx,xxx,...</p>
+	</p>
+	<h3>实体定义</h3>
+		{
+			name:'unique notnull string as entity name',
+			label:'string notnull as entity label',
+			title:'string as entity remark',
+			fields:[
+				{
+					name:'string notnull as column name',
+					label:'string notnull as column shown label',
+					type:'string notnull as column type',
+					title:'string as column remark'
+				},
+				{},
+				...
+			],
+		}	
+	<H1>custom_entity_data</H1>
+	url:/api/custom_entity_data
+	<p>
+	method:GET/PUT/DELETE
+	<H1>users</H1>
+	url:/api/users
+	<p>
+	method:GET/ADD/PUT/DELETE
+  </body>
+</html>

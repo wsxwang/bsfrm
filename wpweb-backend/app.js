@@ -18,6 +18,7 @@ var users = require('./routes/users');
 // route to page
 var debug = require('./routes/debug');
 var home = require('./routes/home');
+var help = require('./routes/help');
 
 var login = require('./routes/login');
 var admin = require('./routes/admin');
@@ -73,6 +74,7 @@ app.use('/api/custom_entity_data', custom_entity_data);
 app.use('/api/users', users);
 app.use('/debug', debug);
 app.use('/', home);
+app.use('/help', help);
 
 app.use('/', login);
 app.use('/login', login);
