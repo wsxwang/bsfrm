@@ -5,52 +5,92 @@
     <title>wpweb api</title>
   </head>
   <body>
-	<H1>
-	<p>
 	<H2>custom_entity</H2>
-	<h3>概述</h3>
-	url:/api/custom_entity<BR/>
-	method:GET/PUT/DELETE<BR/>
-	<h3>用法</h3>
-	<li>查找所有实体 GET /api/custom_entity
-		<p style="font-style:italic">查询的返回值是数组：[{name:'',label:'',title:'',fields:[name:'',type:'',label:'',title:'']},...]</p>
-	</li>
-	<li>查找所有的实体名: GET /api/custom_entity/name
-		<p style="font-style:italic">查询的返回值是数组：['xxx','xxx',...]</p>
-	</li>
-	<li>根据名称查找: GET /api/custom_entity/:name
-		<p style="font-style:italic">查询的返回值是对象：{...}</p>
-	</li>
-	<li>修改或新增一批实体: PUT /api/custom_entity/
-		<p style="font-style:italic">若实体名存在则修改实体信息，否则新增。
-		<BR/>参数是一个数组 [{name:xxx,...},{}...]</p>
-	</li>
-	<li>删除一批实体定义: PUT /api/custom_entity/</li>
-	<p style="font-style:italic">若需要删除的实体不存在则不做任何事。<br/>参数是需要删除的实体名字符串，用逗号分割：xxx,xxx,...</p>
-	</p>
-	<h3>实体定义</h3>
-		{
-			name:'unique notnull string as entity name',
-			label:'string notnull as entity label',
-			title:'string as entity remark',
-			fields:[
-				{
-					name:'string notnull as column name',
-					label:'string notnull as column shown label',
-					type:'string notnull as column type',
-					title:'string as column remark'
-				},
-				{},
-				...
-			],
-		}	
-	<H1>custom_entity_data</H1>
-	url:/api/custom_entity_data
-	<p>
-	method:GET/PUT/DELETE
-	<H1>users</H1>
-	url:/api/users
-	<p>
-	method:GET/ADD/PUT/DELETE
+		<h3>概述</h3>
+			实体元数据定义的api<br/>
+			url:/api/custom_entity<BR/>
+			method:GET/PUT/DELETE<BR/>
+		<h3>用法</h3>
+			<li>查找所有实体 GET /api/custom_entity
+				<p style="font-style:italic">查询的返回值是数组：[{name:'',label:'',title:'',fields:[name:'',type:'',label:'',title:'']},...]</p>
+			</li>
+			<li>查找所有的实体名: GET /api/custom_entity/name
+				<p style="font-style:italic">查询的返回值是数组：['xxx','xxx',...]</p>
+			</li>
+			<li>根据名称查找: GET /api/custom_entity/:name
+				<p style="font-style:italic">查询的返回值是对象：{...}</p>
+			</li>
+			<li>修改或新增一批实体: PUT /api/custom_entity/
+				<p style="font-style:italic">若实体名存在则修改实体信息，否则新增。
+				<BR/>参数是一个数组 [{name:xxx,...},{}...]</p>
+			</li>
+			<li>删除一批实体定义: DELETE /api/custom_entity/
+				<p style="font-style:italic">若需要删除的实体不存在则不做任何事。
+				<br/>参数是需要删除的实体名字符串，用逗号分割：xxx,xxx,...</p>
+			</li>
+		<h3>实体定义</h3>
+			{
+				name:'unique notnull string as entity name',
+				label:'string notnull as entity label',
+				title:'string as entity remark',
+				fields:[
+					{
+						name:'string notnull as column name',
+						label:'string notnull as column shown label',
+						type:'string notnull as column type',
+						title:'string as column remark'
+					},
+					{},
+					...
+				],
+			}
+		
+	<H2>custom_entity_data</H2>
+		<h3>概述</h3>
+			对某实体数据的操作api<br/>
+			所有数据都有一个默认字段：guid，为唯一标识<br/>
+			url:/api/custom_entity_data<BR/>
+			method:GET/PUT/DELETE<BR/>
+		<h3>用法</h3>
+			<li>获取指定实体的所有数据记录 GET /api/custom_entity_data
+				<p style="font-style:italic">返回数据数组：[{},...]</p>
+			</li>
+			<li>获取指定实体的指定guid的数据记录: GET /api/custom_entity_data/:eName/:guid
+				<p style="font-style:italic">查询的返回值是对象：返回{guid:'...',...}或null</p>
+			</li>
+			<li>修改或新增指定实体的一批数据: PUT /api/custom_entity_data/
+				<p style="font-style:italic">根据guid进行更新，若guid不存在则新建
+				<BR/>参数是[{guid:xxx,...},{}...]</p>
+			</li>
+			<li>删除指定实体的一批数据: DELETE /api/custom_entity_data/:eName/:guids
+				<p style="font-style:italic">
+					若需要删除的数据不存在则不做任何事。
+					<br/>参数是需要删除的guid，逗号分割：xxx,xxx,...
+				</p>
+			</li>
+	<H2>users</H2>
+		<h3>概述</h3>
+			用户管理服务api<br/>
+			url:/api/users<BR/>
+			method:GET/ADD/PUT/DELETE<BR/>
+		<h3>用法</h3>
+			<li>获取指定实体的所有数据记录 GET /api/users
+				<p style="font-style:italic">返回数据数组：[{},...]</p>
+			</li>
+			<li>获取指定guid的用户信息: GET /api/users/:id
+				<p style="font-style:italic">参数是用户id的字符串，查询的返回值是对象：返回{guid:'...',...}或null</p>
+			</li>
+			<li>修改或新增指定一个用户: PUT /api/users/
+				<p style="font-style:italic">根据guid进行更新，若guid不存在则新建
+				<BR/>参数是{guid:xxx,...}</p>
+			</li>
+			<li>新增指定一个用户: ADD /api/users/
+				<p style="font-style:italic">参数是{guid:xxx,...}</p>
+			</li>
+			<li>删除指定ID的一个用户: DELETE /api/users/:id
+				<p style="font-style:italic">若需要删除的数据不存在则不做任何事。
+					<br/>参数是需要删除的guid
+				</p>
+			</li>
   </body>
 </html>
