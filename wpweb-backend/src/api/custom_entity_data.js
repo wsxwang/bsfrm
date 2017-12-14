@@ -61,7 +61,7 @@ var delRecords=function(ename, guidArray){
 	base.logger4js_api.trace("[delRecords(%o,%o)]success", ename, guidArray);
 }
 
-// 在表名为ename的表中根据guid更新一批记录
+// 在表名为ename的表中根据guid更新或插入一批记录
 var updateRecords=function(ename, records){
 	base.logger4js_api.trace("[updateRecords(%o,%o)]", ename, records.length);
 	var sqlStr = "";

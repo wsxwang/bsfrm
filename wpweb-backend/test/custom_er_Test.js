@@ -2,6 +2,7 @@ var assert = require('assert');
 var dbOpr = require('../src/cmp/dbOpr_sqlite');
 var api= require('../src/api/custom_entity');
 var data_api = require('../src/api/custom_entity_data');
+var r_api = require('../src/api/custom_relation');
 
 describe('custom_er', function () {
 	describe('entity and fields define test', function(){
@@ -280,5 +281,99 @@ describe('custom_er', function () {
 			done();
 		});
 	});
+	
+	describe('relation access test', function(){
+		var relation_array=[
+		{id1:'10',id2:'01',label:'a-A'},
+		{id1:'01',id2:'10',label:'A-a'},
+		{id1:'10',id2:'02',label:'a-B'},
+		{id1:'20',id2:'02',label:'b-B'},
+		]
+		after(function(done){
+			r_api.delRelations('10,20,30,500,600,700,800,005,006,007,008');
+			console.log('you may need to delete relations manually');
+			done();
+		});
+		it('find', function(done){
+			try{
+				var ret = r_api.allRelations();
+				
+				ret = r_api.relationByID('xxx');
+				assert.equal(ret.length, 0, "should empty 2");
+			}catch(err){
+				assert(false, 'should not throw ' + err);
+			}
+			done();
+		});
+		it('insert', function(done){
+			try{
+				r_api.updateRelations(relation_array);
+				
+				var ret = r_api.relationByID('10');
+				assert.equal(ret.length, 3, "should 3");
+			}catch(err){
+				assert(false, 'should not throw ' + err);
+			}
+			done();
+		});
+		it('update', function(done){
+			try{
+				var update_array=[
+				{id1:'10',id2:'01',label:'a-A up'},
+				{id1:'30',id2:'01',label:'c-A'},
+				]
+				r_api.updateRelations(update_array);
+				
+				var ret = r_api.relationByID('10');
+				var index = ret.findIndex(function(v){return v['id2']=='01';});
+				assert(index >= 0, "should found");
+				assert.equal(ret[index]['label'], 'a-A up', "should update");
+				
+				ret = r_api.relationByID('30');
+				assert.equal(ret.length, 1, "should 1");
+			}catch(err){
+				assert(false, 'should not throw ' + err);
+			}
+			done();
+		});
+		it('delete', function(done){
+			try{
+				r_api.updateRelations([
+					{id1:'500',id2:'005',label:'del'},
+					{id1:'500',id2:'006',label:'del'},
+					{id1:'500',id2:'007',label:'del'},
+					{id1:'600',id2:'005',label:'del'},
+					{id1:'600',id2:'006',label:'del'},
+					{id1:'600',id2:'007',label:'del'},
+					{id1:'700',id2:'005',label:'del'},
+					{id1:'700',id2:'006',label:'del'},
+					{id1:'700',id2:'007',label:'del'},
+					{id1:'800',id2:'005',label:'del'},
+					{id1:'800',id2:'006',label:'del'},
+					{id1:'800',id2:'007',label:'del'},
+					{id1:'005',id2:'105',label:'del'},
+					{id1:'006',id2:'106',label:'del'},
+					{id1:'007',id2:'107',label:'del'},
+					{id1:'800',id2:'500',label:'del'},
+					{id1:'800',id2:'600',label:'del'},
+					{id1:'800',id2:'700',label:'del'},
+					]);
+				r_api.delRelations('500,:005,700:,800:007');
+				
+				var ret = r_api.relationByID('500');
+				assert.equal(ret.length, 0, "should 0");
+				ret = r_api.relationByID('005');
+				assert.equal(ret.length, 1, "005 should 1");
+				ret = r_api.relationByID('700');
+				assert.equal(ret.length, 1, "700 should 1");
+				ret = r_api.relationByID('800');
+				assert.equal(ret.length, 3, "800 should 3");
+			}catch(err){
+				assert(false, 'should not throw ' + err);
+			}
+			done();
+		});
+	});
+
 	
 });

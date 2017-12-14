@@ -43,8 +43,7 @@
 					{},
 					...
 				],
-			}
-		
+			}		
 	<H2>custom_entity_data</H2>
 		<h3>概述</h3>
 			对某实体数据的操作api<br/>
@@ -68,6 +67,37 @@
 					<br/>参数是需要删除的guid，逗号分割：xxx,xxx,...
 				</p>
 			</li>
+	<H2>custom_relation</H2>
+		<h3>概述</h3>
+			对关联关系的操作api<br/>
+			url:/api/custom_relation<BR/>
+			method:GET/PUT/DELETE<BR/>
+		<h3>用法</h3>
+			<li>获取所有关系记录 GET /api/custom_relation
+				<p style="font-style:italic">返回多条记录数组：[{id1:'...',id2:'...',label:'...'},{},...]</p>
+			</li>
+			<li>根据一个id查找包含此id的所有关系 GET /api/custom_relation/:id
+				<p style="font-style:italic">返回多条记录数组：[{id1:'...',id2:'...',label:'...'},{},...]</p>
+			</li>
+			<li>更新或插入一批记录: PUT /api/custom_relation
+				<p style="font-style:italic">若id1、id2的顺序对在表中不存在则新增，否则更新label字段
+				<BR/>参数是[{id1:'...',id2:'...',label:'...'},{},...]</p>
+			</li>
+			<li>根据id删除记录 DELETE /api/custom_relation/:ids
+				<p style="font-style:italic">
+					若需要删除的数据不存在则不做任何事。
+					<br/>字符串，形如：id1,id1:,:id2,id1:id2,...
+					<br/>id1-删除所有包含该id的所有记录
+					<br/>id1:-删除前序包含该id的所有记录
+					<br/>:id2-删除后序包含该id的所有记录
+					<br/>id1:id2-按顺序删除一条记录
+				</p>
+			</li>
+		<h3>字段</h3>
+			注意关系是有方向的，(ID1,ID2,XXX)和(ID2,ID1,XXX)是两条关系
+			<li>id1：字符串，实体1的ID</li>
+			<li>id2：字符串，实体2的ID</li>
+			<li>label：字符串，显示名称</li>
 	<H2>users</H2>
 		<h3>概述</h3>
 			用户管理服务api<br/>

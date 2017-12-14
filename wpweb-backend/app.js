@@ -69,7 +69,7 @@ app.use('/', function(req,res,next){
 });
 
 app.use('/api/custom_entity', custom_entity);
-//app.use('/api/custom_relation', custom_relation);
+app.use('/api/custom_relation', custom_relation);
 app.use('/api/custom_entity_data', custom_entity_data);
 app.use('/api/users', users);
 app.use('/debug', debug);

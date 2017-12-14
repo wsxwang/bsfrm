@@ -7,7 +7,7 @@ var base = require(path.join(__dirname, '../src/cmp/base'));
 
 /*
 webservice:
-定制实体和关系的访问路由
+定制实体的访问路由
 */
 
 // options
