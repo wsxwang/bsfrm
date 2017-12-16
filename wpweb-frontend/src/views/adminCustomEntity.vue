@@ -10,47 +10,47 @@
 				</el-col>
 			</div>
 			<el-col :span="18">
-				<el-tabs activeName="tab1" tab-position="left">
-					<el-tab-pane key="tab1" label="定义" name="tab1">
-				<el-button icon="plus" type="text" size="small" @click="addEntity">新建</el-button>
-				<el-button icon="check" type="text" size="small" @click="onSaveEntityDetail">保存</el-button>
-				<el-button icon="edit" type="text" size="small" @click="fieldsData.push({name:'', label:'', type:'varchar2(255)', title:''})">增加字段</el-button>
-				<el-collapse :value="['entityDetail','entityFields']">
-					<el-collapse-item title="实体信息" name="entityDetail">
-						<el-form  label-width="100px" :model="entityDetailForm" :rules="entityDetailRules">
-							<el-form-item label="表名" prop="name">
-								<el-input v-model="entityDetailForm.name" placeholder="必填。若重复则会冲掉原实体定义！！！"></el-input>
-							</el-form-item>
-							<el-form-item label="显示" prop="label">
-								<el-input v-model="entityDetailForm.label" placeholder="必填。"></el-input>
-							</el-form-item>
-							<el-form-item label="备注" prop="title">
-								<el-input v-model="entityDetailForm.title"></el-input>
-							</el-form-item>
-						</el-form>
-					</el-collapse-item>
-					<el-collapse-item title="字段定义" name="entityFields">
-						<el-table :data="fieldsData" border style="width:100%" @cell-dblclick="handleFieldDblClick"   title="双击表格修改。字段名、显示名称  必填、不能重复！！！已创建的字段不能删除或修改字段名、类型！！！">
-							<el-table-column prop="name" label="字段名"></el-table-column>
-							<el-table-column prop="label" label="显示名称"></el-table-column>
-							<el-table-column prop="type" label="类型">
-								<template slot-scope="scope">
-									<el-select v-model="scope.row.type" size="small">
-										<el-option v-for="item in [{value:'varchar2(255)',label:'字符串'},{value:'number',label:'数字'}]"
-										:key="item.value" :label="item.label" :value="item.value">
-										</el-option>
-									</el-select>
-								</template>
-							</el-table-column>
-							<el-table-column prop="title" label="备注"></el-table-column>
-							<el-table-column prop="opr" label="操作" fixed="right" width="80"><template slot-scope="scope">
-								<el-button @click.native.prevent="fieldsData.splice(scope.$index, 1)" type="text" size="small" title="对于已保存的字段，其字段名、类型不能修改，且不能删除">移除</el-button>
-							</template></el-table-column>
-						</el-table>
-					</el-collapse-item>
-				</el-collapse>
+				<el-tabs id="custom_entity" class="custom_entity" activeName="custom_entity_define" tab-position="top">
+					<el-tab-pane key="custom_entity_define" label="定义" name="custom_entity_define">
+						<el-button icon="plus" type="text" size="small" @click="addEntity">新建</el-button>
+						<el-button icon="check" type="text" size="small" @click="onSaveEntityDetail">保存</el-button>
+						<el-button icon="edit" type="text" size="small" @click="fieldsData.push({name:'', label:'', type:'varchar2(255)', title:''})">增加字段</el-button>
+						<el-collapse :value="['entityDetail','entityFields']">
+							<el-collapse-item title="实体信息" name="entityDetail">
+								<el-form  label-width="100px" :model="entityDetailForm" :rules="entityDetailRules">
+									<el-form-item label="表名" prop="name">
+										<el-input v-model="entityDetailForm.name" placeholder="必填。若重复则会冲掉原实体定义！！！"></el-input>
+									</el-form-item>
+									<el-form-item label="显示" prop="label">
+										<el-input v-model="entityDetailForm.label" placeholder="必填。"></el-input>
+									</el-form-item>
+									<el-form-item label="备注" prop="title">
+										<el-input v-model="entityDetailForm.title"></el-input>
+									</el-form-item>
+								</el-form>
+							</el-collapse-item>
+							<el-collapse-item title="字段定义" name="entityFields">
+								<el-table :data="fieldsData" border style="width:100%" @cell-dblclick="handleFieldDblClick"   title="双击表格修改。字段名、显示名称  必填、不能重复！！！已创建的字段不能删除或修改字段名、类型！！！">
+									<el-table-column prop="name" label="字段名"></el-table-column>
+									<el-table-column prop="label" label="显示名称"></el-table-column>
+									<el-table-column prop="type" label="类型">
+										<template slot-scope="scope">
+											<el-select v-model="scope.row.type" size="small">
+												<el-option v-for="item in [{value:'varchar2(255)',label:'字符串'},{value:'number',label:'数字'}]"
+												:key="item.value" :label="item.label" :value="item.value">
+												</el-option>
+											</el-select>
+										</template>
+									</el-table-column>
+									<el-table-column prop="title" label="备注"></el-table-column>
+									<el-table-column prop="opr" label="操作" fixed="right" width="80"><template slot-scope="scope">
+										<el-button @click.native.prevent="fieldsData.splice(scope.$index, 1)" type="text" size="small" title="对于已保存的字段，其字段名、类型不能修改，且不能删除">移除</el-button>
+									</template></el-table-column>
+								</el-table>
+							</el-collapse-item>
+						</el-collapse>
 					</el-tab-pane>
-					<el-tab-pane key="tab2" label="数据" name="tab2">
+					<el-tab-pane key="custom_entity_data" label="数据" name="custom_entity_data">
 						<customEntityDataView :entityName="entityDetailForm['name']"></customEntityDataView>
 					</el-tab-pane>
 				</el-tabs>

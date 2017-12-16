@@ -4,14 +4,14 @@
 			<el-button plain icon="el-icon-upload" size="mini" @click="onSaveInfo">保存</el-button>
 			<el-button plain icon="el-icon-refresh" size="mini" @click="loadRelation">获取关联关系</el-button>
 		</div>
-        <el-tabs activeName="tab1" type="card">
-            <el-tab-pane label="信息" name="tab1">
+        <el-tabs id="entity_data" class="entity_data" activeName="entity_info" type="card" tab-position="top">
+            <el-tab-pane label="信息" name="entity_info">
 				<el-table :data="data" style="width:100%" border stripe :show-header="false" title="双击修改" @row-dblclick="handleRowDblClick">
 					<el-table-column prop="label" label="label" :width="100"></el-table-column>
 					<el-table-column prop="value" label="value"></el-table-column>
 				</el-table>
             </el-tab-pane>
-            <el-tab-pane key="custom_relation" label="关联" name="tab2">
+            <el-tab-pane label="关联" name="entity_relation">
 				<el-table :data="rel_data" style="width:100%" :border="false" stripe :show-header="false" title="关联关系">
 					<el-table-column prop="id1" label="guid"></el-table-column>
 					<el-table-column prop="label" label="label"></el-table-column>
