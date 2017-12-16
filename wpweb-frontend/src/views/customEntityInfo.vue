@@ -2,6 +2,7 @@
     <div>
 		<div style="margin-bottom: 20px;">
 			<el-button plain icon="el-icon-upload" size="mini" @click="onSaveInfo">保存</el-button>
+			<el-button plain icon="el-icon-refresh" size="mini" @click="loadRelation">获取关联关系</el-button>
 		</div>
         <el-tabs activeName="tab1" type="card">
             <el-tab-pane label="信息" name="tab1">
@@ -11,6 +12,11 @@
 				</el-table>
             </el-tab-pane>
             <el-tab-pane key="custom_relation" label="关联" name="tab2">
+				<el-table :data="rel_data" style="width:100%" :border="false" stripe :show-header="false" title="关联关系">
+					<el-table-column prop="id1" label="guid"></el-table-column>
+					<el-table-column prop="label" label="label"></el-table-column>
+					<el-table-column prop="id2" label="guid"></el-table-column>
+				</el-table>
             </el-tab-pane>
         </el-tabs>
     </div>
@@ -25,11 +31,13 @@ export default {
     data() {
         return {
             baseUrl:'/api/custom_entity_data',
+            relUrl:'/api/custom_relation',
 			
 			next:{item:null, metaData:null},
 			previous:{item:null, metaData:null},
 			
 			data:[],
+			rel_data:[],
         };
     },
 	props:{
@@ -43,6 +51,7 @@ export default {
 			handler(val,oldVal){
 				console.log('[customEntityInfo.watch.record] %o->%o', oldVal, val);
 				this.mountRecordData();
+				this.rel_data = [];
 			},
 			deep:true,
 		},
@@ -102,9 +111,8 @@ export default {
 					this.$emit('infoSaved', savedInfo);
 				}.bind(this))
 				.catch(function(error){apiBase.handleAxiosError(error, this);}.bind(this));
-
         },
-		// 双击修改
+		// 双击修改基本信息
 		handleRowDblClick(row, e){
 			console.log('[customEntityInfo.handleRowDblClick(%o,%o)]%o', this.metadata, this.record, row);
 			if(row['name'] == 'guid')return;
@@ -120,7 +128,19 @@ export default {
 				row['value'] = value;
 			}).catch(() => {});
 			
-		}
+		},
+		// 刷新关联关系
+		loadRelation(){
+			if(this.record == null) return;
+			
+			axios.get(this.relUrl+'/'+this.record['guid'])
+				.then(function (response) {
+					console.log('[customEntityInfo.loadRelation(%o,%o)]GET %o %o ok', this.metadata, this.record, this.relUrl+'/'+this.record['guid'], response);
+					this.rel_data = response.data;
+				}.bind(this))
+				.catch(function(error){apiBase.handleAxiosError(error, this);}.bind(this));
+		},
+
     },
     mounted(){
 		console.log('[customEntityInfo.mounted(%o,%o)]', this.metadata, this.record);

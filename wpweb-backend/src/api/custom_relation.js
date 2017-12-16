@@ -2,10 +2,13 @@
 自定义关系的api，涉及到数据表TBL_relation，在数据库文件custom_data中
 字段：
     ID1:实体1ID
+	ename1:实体1的元数据名称
     ID2:实体2ID
+	ename2:实体2的元数据名称
     label:显示名称
 注意1：关系是有方向的，(ID1,ID2,XXX)和(ID2,ID1,XXX)是两条关系
 注意2：(ID1,ID2,方向)唯一确定一条关系
+ID1和ID2是必填的
 全部是同步调用，错误处理采用异常抛出方式
 */
 var assert=require('assert');
@@ -15,7 +18,7 @@ var base=require('../cmp/base');
 
 const fileName_data = path.join(__dirname, '../../public/db/custom_data.db')
 
-// 返回所有数据，返回：[{id1:'...',id2:'...',label:'...'},{},...]
+// 返回所有数据，返回：[{id1:'...',ename1:'...',id2:'...',ename2:'...',label:'...'},{},...]
 var allRelations=function(){
 	base.logger4js_api.trace("[allRelations()]");
 	var sqlStr = "";
@@ -28,13 +31,14 @@ var allRelations=function(){
 	return data_ret;
 };
 
-// 根据一个id查找包含此id的所有关系，返回：[{id1:'...',id2:'...',label:'...'},{},...]
+// 根据一个id查找包含此id的所有关系，返回：[{id1:'...',ename1:'...',id2:'...',ename2:'...',label:'...'},{},...]
+// 参数id可采用表达式，表达式规则参见delRelations
 var relationByID=function(id){
 	base.logger4js_api.trace("[relationByID(%o)]", id);
 	var sqlStr = "";
 
 	// 在数据文件中查找数据
-	sqlStr = "SELECT * FROM TBL_relation WHERE id1='"+ id +"' OR id2='" + id + "'";
+	sqlStr = "SELECT * FROM TBL_relation WHERE " + id2Where(id);
     var data_ret = dbOpr.exec_sync(fileName_data, sqlStr);
 	if ('error' in data_ret){throw data_ret;}
 	base.logger4js_api.trace("[relationByID(%o)]record found", id);
@@ -55,22 +59,7 @@ var delRelations=function(idArray){
 	
 	var arr = idArray.split(",");
 	for (var i in arr){
-		sqlStr = "DELETE FROM TBL_relation WHERE ";
-		var ids = arr[i].split(":");
-		if(ids.length == 1){
-			sqlStr += "id1 ='" + ids[0] + "' OR id2='" + ids[0] + "'";
-			sqlArray.push(sqlStr);
-			continue;
-		}
-		if(ids[0] != ''){
-			sqlStr += "id1 = '" + ids[0] + "'";
-		}
-		if((ids[0] != '') && (ids[1] != '')){
-			sqlStr += ' AND ';
-		}
-		if(ids[1] != ''){
-			sqlStr += "id2 = '" + ids[1] + "'";
-		}
+		sqlStr = "DELETE FROM TBL_relation WHERE " + id2Where(arr[i]);
 		sqlArray.push(sqlStr);
 	}	
 	ret = dbOpr.execBatch_sync(fileName_data, sqlArray);
@@ -81,8 +70,9 @@ var delRelations=function(idArray){
 }
 
 // 更新或插入一批记录
-// records：[{id1:'...',id2:'...',label:'...'},{},...]
+// records：[{id1:'...',ename1:'...',id2:'...',ename2:'...',label:'...'},{},...]
 // 若id1、id2的顺序对在表中不存在则新增，否则更新label字段
+// 若id1、id2有任意一个为空，则跳过该记录
 var updateRelations=function(records){
 	base.logger4js_api.trace("[updateRelations(%o)]", records.length);
 	var sqlStr = "";
@@ -96,6 +86,10 @@ var updateRelations=function(records){
 	base.logger4js_api.trace("[updateRelations(%o)]%d records need update:%o", records.length, data_ret.length, data_ret);
 
 	for(var i in records){
+		if((records[i]['id1'] == '') || (records[i]['id1'] == null) || (records[i]['id2'] == '') || (records[i]['id2'] == null)){
+			base.logger4js_api.warn("[updateRelations(%o)]%o id1 or id2 empty!", records.length, records[i]);
+			continue;
+		}
 		if(data_ret.findIndex(function(v){return (records[i]['id1']==v['id1'])&&(records[i]['id2']==v['id2']);}) >= 0){
 			// 更新记录
 			updateRelation(records[i]);
@@ -130,6 +124,28 @@ var insertRelation=function(record){
 		throw ret;
 	}
 	base.logger4js_api.trace("[insertRelation(%o)]succ", record);
+}
+
+// 根据id表达式拼成where语句
+// id采用的表达式格式参见delRelations
+var id2Where=function(id){
+	var sqlStr = "";
+	var ids = id.split(":");
+	if(ids.length == 1){
+		sqlStr += "id1 ='" + ids[0] + "' OR id2='" + ids[0] + "'";
+	}else{
+		if(ids[0] != ''){
+			sqlStr += "id1 = '" + ids[0] + "'";
+		}
+		if((ids[0] != '') && (ids[1] != '')){
+			sqlStr += ' AND ';
+		}
+		if(ids[1] != ''){
+			sqlStr += "id2 = '" + ids[1] + "'";
+		}
+	}
+	base.logger4js_api.trace("[id2Where(%o)]%o", id, sqlStr);
+	return sqlStr;
 }
 
 module.exports={

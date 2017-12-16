@@ -26,8 +26,8 @@
 			@current-change="handleCurrentChange"
 		></el-pagination>
 		-->
-		<el-dialog :visible.sync="recordDialogVisible" :before-close="handleCloseDlg">
-			<customEntityInfo :record="currentRecord" :metadata="metadata" @infoSaved="handleInfoSaved"></customEntityInfo>
+		<el-dialog :visible.sync="recordDialogVisible" :before-close="handleCloseDlg" :title="metadata!=null?metadata['label']:''">
+			<customEntityInfo :record="currentRecord" :metadata="metadata"  @infoSaved="handleInfoSaved"></customEntityInfo>
 		</el-dialog>
     </div>
 </template>
@@ -90,7 +90,7 @@ export default {
 		},
 		// 添加记录
 		addRecord:function(){
-			this.currentRecord = null;
+			this.currentRecord = {guid:apiBase.newGuid()};
 			this.recordDialogVisible = true;
 		},
 		// 字段列表双击某格

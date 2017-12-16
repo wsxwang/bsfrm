@@ -16,7 +16,7 @@ router.options('/', function (req,res,next) {
     next();
 })
 
-// 获取所有关系记录，返回：[{id1:'...',id2:'...',label:'...'},{},...]
+// 获取所有关系记录，返回：[{id1:'...',ename1:'...',id2:'...',ename2:'...',label:'...'},{},...]
 router.get('/',function(req, res, next) {
 	base.logger4js_api.trace("[GET %s%s]",req.baseUrl, req.path);
     res.header('Content-Type', 'application/json;charset=utf-8');
@@ -30,7 +30,7 @@ router.get('/',function(req, res, next) {
     }
 });
 
-// 根据一个id查找包含此id的所有关系，返回：[{id1:'...',id2:'...',label:'...'},{},...]
+// 根据一个id查找包含此id的所有关系，返回：[{id1:'...',ename1:'...',id2:'...',ename2:'...',label:'...'},{},...]
 router.get('/:id', function (req, res, next) {
 	base.logger4js_api.trace("[GET %s%s(%s)]",req.baseUrl, req.path, req.params.id);
     res.header('Content-Type', 'application/json;charset=utf-8');
@@ -44,7 +44,9 @@ router.get('/:id', function (req, res, next) {
     }
 });
 
-// 更新或插入一批记录，参数是[{id1:'...',id2:'...',label:'...'},{},...]，若id1、id2的顺序对在表中不存在则新增，否则更新label字段
+// 更新或插入一批记录，参数是[{id1:'...',ename1:'...',id2:'...',ename2:'...',label:'...'},{},...]
+// 若id1、id2的顺序对在表中不存在则新增，否则更新label字段
+// 若id1、id2有任意一个为空，则跳过该记录
 router.put('/', function (req,res,next) {
 	base.logger4js_api.trace("[PUT %s%s(%d)]",req.baseUrl, req.path, req.body.length);
     res.header('Content-Type', 'application/json;charset=utf-8');

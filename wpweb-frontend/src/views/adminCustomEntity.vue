@@ -10,6 +10,8 @@
 				</el-col>
 			</div>
 			<el-col :span="18">
+				<el-tabs activeName="tab1" tab-position="left">
+					<el-tab-pane key="tab1" label="定义" name="tab1">
 				<el-button icon="plus" type="text" size="small" @click="addEntity">新建</el-button>
 				<el-button icon="check" type="text" size="small" @click="onSaveEntityDetail">保存</el-button>
 				<el-button icon="edit" type="text" size="small" @click="fieldsData.push({name:'', label:'', type:'varchar2(255)', title:''})">增加字段</el-button>
@@ -47,6 +49,11 @@
 						</el-table>
 					</el-collapse-item>
 				</el-collapse>
+					</el-tab-pane>
+					<el-tab-pane key="tab2" label="数据" name="tab2">
+						<customEntityDataView :entityName="entityDetailForm['name']"></customEntityDataView>
+					</el-tab-pane>
+				</el-tabs>
 			</el-col>
 		</el-row>
     </div>
@@ -56,6 +63,7 @@
     import axios from 'axios';
 	import { Loading } from 'element-ui';
 	import apiBase from '../api/apiBase.js';
+	import customEntityDataView from './customEntityDataView.vue'
 
 export default {
     data() {
@@ -333,7 +341,10 @@ export default {
     },
     mounted(){
         this.refreshEntity();
-    }
+    },
+	components:{
+		customEntityDataView,
+	},
 }
 </script>
 

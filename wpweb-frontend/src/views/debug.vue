@@ -22,10 +22,6 @@
 					<adminequ></adminequ>
 				</div>
 				<div :style="chosenVue=='adminusr'?'display:block':'display:none'"><adminusr></adminusr></div>
-				<div :style="chosenVue=='customEntityDataView'?'display:block':'display:none'">
-					<el-input placeholder="entity name" v-model="entityName"></el-input>
-					<customEntityDataView :entityName="entityName"></customEntityDataView>
-				</div>
 				<div :style="chosenVue=='login'?'display:block':'display:none'"><login></login></div>
 				<div :style="chosenVue=='nav_panel'?'display:block':'display:none'"><nav_panel></nav_panel></div>
 			</p>

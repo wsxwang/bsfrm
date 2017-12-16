@@ -290,7 +290,7 @@ describe('custom_er', function () {
 		{id1:'20',id2:'02',label:'b-B'},
 		]
 		after(function(done){
-			r_api.delRelations('10,20,30,500,600,700,800,005,006,007,008');
+			r_api.delRelations('10,20,30,500,600,700,800,005,006,007,008,same1');
 			console.log('you may need to delete relations manually');
 			done();
 		});
@@ -311,6 +311,12 @@ describe('custom_er', function () {
 				
 				var ret = r_api.relationByID('10');
 				assert.equal(ret.length, 3, "should 3");
+				ret = r_api.relationByID('10:');
+				assert.equal(ret.length, 2, "should 2");
+				ret = r_api.relationByID(':02');
+				assert.equal(ret.length, 2, "should 2 second");
+				ret = r_api.relationByID('10:01');
+				assert.equal(ret.length, 1, "should 1");
 			}catch(err){
 				assert(false, 'should not throw ' + err);
 			}
@@ -368,6 +374,52 @@ describe('custom_er', function () {
 				assert.equal(ret.length, 1, "700 should 1");
 				ret = r_api.relationByID('800');
 				assert.equal(ret.length, 3, "800 should 3");
+			}catch(err){
+				assert(false, 'should not throw ' + err);
+			}
+			done();
+		});
+		it('id1 or id2 empty test', function(done){
+			try{
+				var ret = r_api.allRelations();
+				var count = ret.length;
+				r_api.updateRelations([
+					{id1:'',id2:'',label:'e-e'},
+					{label:'n-n'},
+					{id1:'',label:'e-n'},
+					{id2:'',label:'n-e'},
+					{id1:'',id2:'ok',label:'e-ok'},
+					{id2:'ok',label:'n-ok'},
+					{id1:'ok',id2:'',label:'ok-e'},
+					{id1:'ok',label:'ok-n'},
+					]);
+				ret = r_api.allRelations();
+				assert.equal(ret.length, count, "should not insert");
+			}catch(err){
+				assert(false, 'should not throw ' + err);
+			}
+			done();
+		});
+		it('insert same and delete', function(done){
+			try{
+				var ret = r_api.allRelations();
+				var count = ret.length;
+				r_api.updateRelations([
+					{id1:'same1',id2:'same2',label:'same test'},
+					{id1:'same1',id2:'same2',label:'same test'},
+					]);
+				ret = r_api.relationByID('same1:same2');
+				assert.equal(ret.length, 2, "should insert 2");
+				
+				r_api.updateRelations([{id1:'same1',id2:'same2',label:'same test update'}]);
+				ret = r_api.relationByID('same1:same2');
+				assert.equal(ret.length, 2, "should update 2");
+				assert.equal(ret[0]['label'], 'same test update', "should same 1");
+				assert.equal(ret[1]['label'], 'same test update', "should same 2");
+				
+				r_api.delRelations('same1:same2');
+				ret = r_api.relationByID('same1:same2');
+				assert.equal(ret.length, 0, "should delete 2");
 			}catch(err){
 				assert(false, 'should not throw ' + err);
 			}

@@ -74,14 +74,14 @@
 			method:GET/PUT/DELETE<BR/>
 		<h3>用法</h3>
 			<li>获取所有关系记录 GET /api/custom_relation
-				<p style="font-style:italic">返回多条记录数组：[{id1:'...',id2:'...',label:'...'},{},...]</p>
+				<p style="font-style:italic">返回多条记录数组：[{id1:'...',ename1:'...',id2:'...',ename2:'...',label:'...'},{},...]</p>
 			</li>
 			<li>根据一个id查找包含此id的所有关系 GET /api/custom_relation/:id
-				<p style="font-style:italic">返回多条记录数组：[{id1:'...',id2:'...',label:'...'},{},...]</p>
+				<p style="font-style:italic">返回多条记录数组：[{id1:'...',ename1:'...',id2:'...',ename2:'...',label:'...'},{},...]</p>
 			</li>
 			<li>更新或插入一批记录: PUT /api/custom_relation
-				<p style="font-style:italic">若id1、id2的顺序对在表中不存在则新增，否则更新label字段
-				<BR/>参数是[{id1:'...',id2:'...',label:'...'},{},...]</p>
+				<p style="font-style:italic">若id1、id2的顺序对在表中不存在则新增，否则更新label字段。若id1、id2有任意一个为空，则跳过该记录
+				<BR/>参数是[{id1:'...',ename1:'...',id2:'...',ename2:'...',label:'...'},{},...]</p>
 			</li>
 			<li>根据id删除记录 DELETE /api/custom_relation/:ids
 				<p style="font-style:italic">
@@ -96,7 +96,9 @@
 		<h3>字段</h3>
 			注意关系是有方向的，(ID1,ID2,XXX)和(ID2,ID1,XXX)是两条关系
 			<li>id1：字符串，实体1的ID</li>
+			<li>ename1:实体1的元数据名称，可以为空</li>
 			<li>id2：字符串，实体2的ID</li>
+			<li>ename2:实体1的元数据名称，可以为空</li>
 			<li>label：字符串，显示名称</li>
 	<H2>users</H2>
 		<h3>概述</h3>

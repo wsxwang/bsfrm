@@ -5,6 +5,7 @@
 				<adminCustomEntity></adminCustomEntity>
             </el-tab-pane>
             <el-tab-pane key="custom_relation" label="关联定义" name="custom_relation">
+				<adminCustomRelation></adminCustomRelation>
             </el-tab-pane>
         </el-tabs>
     </div>
@@ -12,6 +13,7 @@
 
 <script>
 	import adminCustomEntity from './adminCustomEntity.vue'
+	import adminCustomRelation from './adminCustomRelation.vue'
 
 export default {
     data() {
@@ -24,6 +26,7 @@ export default {
     },
 	components:{
 		adminCustomEntity,
+		adminCustomRelation,
 	},
 }
 </script>
