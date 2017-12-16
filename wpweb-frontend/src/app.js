@@ -12,7 +12,7 @@ import routes from './routes'
 
 
 // axios配置
-axios.defaults.baseURL='http://localhost:3000/';
+axios.defaults.baseURL=(process.env.NODE_ENV=='production')?window.location.origin:'http://localhost:3000';
 
 Vue.use(Vuex);
 Vue.use(elementui);
