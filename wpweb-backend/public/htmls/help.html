@@ -102,7 +102,7 @@
 		<h3>概述</h3>
 			用户管理服务api<br/>
 			url:/api/users<BR/>
-			method:GET/ADD/PUT/DELETE<BR/>
+			method:GET/POST/PUT/DELETE<BR/>
 		<h3>用法</h3>
 			<li>获取所有数据记录 GET /api/users
 				<p style="font-style:italic">返回数据数组：[{},...]</p>
@@ -114,7 +114,7 @@
 				<p style="font-style:italic">根据guid进行更新，若guid不存在则新建
 				<BR/>参数是{guid:xxx,...}</p>
 			</li>
-			<li>新增指定一个用户: ADD /api/users/
+			<li>新增指定一个用户: POST /api/users/
 				<p style="font-style:italic">参数是{guid:xxx,...}</p>
 			</li>
 			<li>删除指定ID的一个用户: DELETE /api/users/:id
